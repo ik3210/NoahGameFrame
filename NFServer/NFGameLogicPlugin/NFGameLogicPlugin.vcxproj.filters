@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="NFBuffModule">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="NFPVPModule">
+      <UniqueIdentifier>{61a8697e-e6af-4dc2-a039-8939512fadc9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NFCommonConfigModule">
+      <UniqueIdentifier>{15121c6f-c078-4629-81c4-7bac017e056f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NFGMModule">
+      <UniqueIdentifier>{9c627c80-9536-4c28-8b31-2dc81cfd2d6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NFMapModule">
+      <UniqueIdentifier>{54157a03-de81-4609-966f-ec32582895de}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NFTeamModule">
+      <UniqueIdentifier>{bfd97019-f760-4999-9fb3-197a9ebb45ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NFSwichServerModule">
+      <UniqueIdentifier>{dd64f829-9c74-471a-b6b8-37bd590bb077}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NFCreateRoleModule">
+      <UniqueIdentifier>{ca2648e6-36dd-4163-9791-b22482d4b8b6}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="NFCBuffModule.h">
+      <Filter>NFBuffModule</Filter>
+    </ClInclude>
+    <ClInclude Include="NFGameLogicPlugin.h" />
+    <ClInclude Include="NFCPVPModule.h">
+      <Filter>NFPVPModule</Filter>
+    </ClInclude>
+    <ClInclude Include="NFCCommonConfigModule.h">
+      <Filter>NFCommonConfigModule</Filter>
+    </ClInclude>
+    <ClInclude Include="NFCGmModule.h">
+      <Filter>NFGMModule</Filter>
+    </ClInclude>
+    <ClInclude Include="NFCGSSwichServerModule.h">
+      <Filter>NFSwichServerModule</Filter>
+    </ClInclude>
+    <ClInclude Include="NFCMapModule.h">
+      <Filter>NFMapModule</Filter>
+    </ClInclude>
+    <ClInclude Include="NFCCreateRoleModule.h">
+      <Filter>NFCreateRoleModule</Filter>
+    </ClInclude>
+    <ClInclude Include="NFCTileModule.h">
+      <Filter>NFMapModule</Filter>
+    </ClInclude>
+    <ClInclude Include="NFCTeamPVPModule.h">
+      <Filter>NFPVPModule</Filter>
+    </ClInclude>
+    <ClInclude Include="NFCTeamModule.h">
+      <Filter>NFTeamModule</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="NFCBuffModule.cpp">
+      <Filter>NFBuffModule</Filter>
+    </ClCompile>
+    <ClCompile Include="NFGameLogicPlugin.cpp" />
+    <ClCompile Include="NFCPVPModule.cpp">
+      <Filter>NFPVPModule</Filter>
+    </ClCompile>
+    <ClCompile Include="NFCCommonConfigModule.cpp">
+      <Filter>NFCommonConfigModule</Filter>
+    </ClCompile>
+    <ClCompile Include="NFCGmModule.cpp">
+      <Filter>NFGMModule</Filter>
+    </ClCompile>
+    <ClCompile Include="NFCGSSwichServerModule.cpp">
+      <Filter>NFSwichServerModule</Filter>
+    </ClCompile>
+    <ClCompile Include="NFCMapModule.cpp">
+      <Filter>NFMapModule</Filter>
+    </ClCompile>
+    <ClCompile Include="NFCCreateRoleModule.cpp">
+      <Filter>NFCreateRoleModule</Filter>
+    </ClCompile>
+    <ClCompile Include="NFCTileModule.cpp">
+      <Filter>NFMapModule</Filter>
+    </ClCompile>
+    <ClCompile Include="NFCTeamPVPModule.cpp">
+      <Filter>NFPVPModule</Filter>
+    </ClCompile>
+    <ClCompile Include="NFCTeamModule.cpp">
+      <Filter>NFTeamModule</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

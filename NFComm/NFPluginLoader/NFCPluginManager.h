@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//    @FileName      :    NFCPluginManager.h
+//    @FileName			:    NFCPluginManager.h
 //    @Author           :    LvSheng.Huang
 //    @Date             :    2012-12-15
 //    @Module           :    NFCPluginManager
@@ -13,124 +13,109 @@
 #include <string>
 #include <time.h>
 #include "NFCDynLib.h"
+#include "NFComm/NFCore/NFSingleton.hpp"
 #include "NFComm/NFPluginModule/NFIPluginManager.h"
-#include "NFComm/NFCore/NFQueue.h"
 
 class NFCPluginManager
-    : public NFIPluginManager
+    : public NFIPluginManager,
+	public NFSingleton<NFCPluginManager>
 {
 public:
-    NFCPluginManager(NFIActorManager* pManager) : NFIPluginManager(pManager)
-    {
-        mbOnReloadPlugin = false;
-        m_pActorManager = pManager;
-        mnAppID = 0;
-        mnInitTime = time(NULL);
-        mnNowTime = mnInitTime;
+    NFCPluginManager();
+    virtual ~NFCPluginManager();
 
-        mstrConfigPath = "";
-    }
+	virtual bool Awake();
 
-    virtual bool Init();
+	virtual bool Init();
 
     virtual bool AfterInit();
 
     virtual bool CheckConfig();
 
+    virtual bool ReadyExecute();
+
     virtual bool BeforeShut();
 
-    virtual bool Shut();
+	virtual bool Shut();
+
+	virtual bool Finalize();
+
 
     //////////////////////////////////////////////////////////////////////////
-
-    virtual bool LoadPlugin();
-
-    // virtual bool UnLoadPlugin();
 
     virtual void Registered(NFIPlugin* pPlugin);
 
-    virtual void UnsRegistered(NFIPlugin* pPlugin);
+    virtual void UnRegistered(NFIPlugin* pPlugin);
 
-    virtual bool ReInitialize();
     //////////////////////////////////////////////////////////////////////////
+
+	virtual bool ReLoadPlugin(const std::string& strPluginDLLName);
 
     virtual NFIPlugin* FindPlugin(const std::string& strPluginName);
 
-    virtual void AddModule(const std::string& strModuleName, NFILogicModule* pModule);
+    virtual void AddModule(const std::string& strModuleName, NFIModule* pModule);
 
     virtual void RemoveModule(const std::string& strModuleName);
 
-    virtual NFILogicModule* FindModule(const std::string& strModuleName);
-
-    virtual void AddComponent(const std::string& strComponentName, NFIComponent* pComponent);
-
-    virtual void RemoveComponent(const std::string& strComponentName);
-
-    virtual NFIComponent* FindComponent(const std::string& strComponentName);
+    virtual NFIModule* FindModule(const std::string& strModuleName);
 
     virtual bool Execute();
 
-    //  virtual void OnReloadModule( const std::string& strModuleName, NFILogicModule* pModule );
-    //
-    //  virtual void ReloadPlugin( const std::string& pluginName );
+	virtual int GetAppID() const;
 
-    virtual void HandlerEx(const NFIActorMessage& message, const Theron::Address from);
-    virtual NFIActorManager* GetActorManager()
-    {
-        return m_pActorManager;
-    }
+    virtual void SetAppID(const int nAppID);
 
-    virtual int AppID()
-    {
-        return mnAppID;
-    }
-    virtual NFINT64 GetInitTime() const
-    {
-        return mnInitTime;
-    }
-    virtual NFINT64 GetNowTime() const
-    {
-        return mnNowTime;
-    }
+	virtual NFINT64 GetInitTime() const;
 
-    virtual const std::string& GetConfigPath() const
-    {
-        return mstrConfigPath;
-    }
+	virtual NFINT64 GetNowTime() const;
+
+	virtual const std::string& GetConfigPath() const;
+
+	virtual void SetConfigName(const std::string& strFileName);
+
+	virtual const std::string& GetAppName() const;
+
+	virtual void SetAppName(const std::string& strAppName);
+
+	virtual const std::string& GetLogConfigName() const;
+
+	virtual void SetLogConfigName(const std::string& strName);
+
+	virtual void SetGetFileContentFunctor(GET_FILECONTENT_FUNCTOR fun);
+
+	virtual bool GetFileContent(const std::string &strFileName, std::string &strContent);
 
 protected:
+	bool LoadPluginConfig();
 
-    virtual bool LoadPluginLibrary(const std::string& strPluginDLLName);
-    virtual bool UnLoadPluginLibrary(const std::string& strPluginDLLName);
-
-protected:
-    virtual bool ExecuteEvent();
+	bool LoadStaticPlugin(const std::string& strPluginDLLName);
+    bool LoadPluginLibrary(const std::string& strPluginDLLName);
+    bool UnLoadPluginLibrary(const std::string& strPluginDLLName);
+	bool UnLoadStaticPlugin(const std::string& strPluginDLLName);
 
 private:
-    bool mbOnReloadPlugin;
-    NFIActorManager* m_pActorManager;
-    NFQueue<NFIActorMessage> mxQueue;
-
     int mnAppID;
     NFINT64 mnInitTime;
     NFINT64 mnNowTime;
     std::string mstrConfigPath;
+	std::string mstrConfigName;
+	std::string mstrAppName;
+	std::string mstrLogConfigName;
 
     typedef std::map<std::string, bool> PluginNameMap;
     typedef std::map<std::string, NFCDynLib*> PluginLibMap;
     typedef std::map<std::string, NFIPlugin*> PluginInstanceMap;
-    typedef std::map<std::string, NFILogicModule*> ModuleInstanceMap;
-    typedef std::map<std::string, NFIComponent*> ComponentInstanceMap;
+    typedef std::map<std::string, NFIModule*> ModuleInstanceMap;
 
     typedef void(* DLL_START_PLUGIN_FUNC)(NFIPluginManager* pm);
     typedef void(* DLL_STOP_PLUGIN_FUNC)(NFIPluginManager* pm);
-
 
     PluginNameMap mPluginNameMap;
     PluginLibMap mPluginLibMap;
     PluginInstanceMap mPluginInstanceMap;
     ModuleInstanceMap mModuleInstanceMap;
-    ComponentInstanceMap mComponentInstanceMap;
+
+	GET_FILECONTENT_FUNCTOR mGetFileContentFunctor;
 };
 
 #endif

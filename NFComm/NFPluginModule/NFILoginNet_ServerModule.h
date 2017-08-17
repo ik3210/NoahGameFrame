@@ -1,8 +1,8 @@
 // -------------------------------------------------------------------------
-//    @FileName         £º    NFILoginNet_ServerModule.h
-//    @Author           £º    LvSheng.Huang
-//    @Date             £º    2012-12-15
-//    @Module           £º    NFILoginNet_ServerModule
+
+
+
+
 //
 // -------------------------------------------------------------------------
 
@@ -10,16 +10,16 @@
 #define NFI_LOGINNET_SERVERMODULE_H
 
 #include <iostream>
-#include "NFILogicModule.h"
+#include "NFIModule.h"
 #include "NFINetModule.h"
 
 class NFILoginNet_ServerModule
-    : public NFINetModule
+    : public NFIModule
 {
 public:
 
     virtual int OnSelectWorldResultsProcess(const int nWorldID, const NFGUID xSenderID, const int nLoginID, const std::string& strAccount, const std::string& strWorldIP, const int nWorldPort, const std::string& strKey) = 0;
-
+    //virtual NFINetModule* GetNetModule() = 0;
 };
 
 #endif

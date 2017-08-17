@@ -25,16 +25,15 @@ const int Tutorial1::GetPluginVersion()
 
 const std::string Tutorial1::GetPluginName()
 {
-    return GET_CLASS_NAME(Tutorial1)
+	return GET_CLASS_NAME(Tutorial1);
 }
 
 void Tutorial1::Install()
 {
-    REGISTER_MODULE(pPluginManager, HelloWorld1)
-
+    REGISTER_MODULE(pPluginManager, NFIHelloWorld1, NFCHelloWorld1)
 }
 
 void Tutorial1::Uninstall()
 {
-    UNREGISTER_MODULE(pPluginManager, HelloWorld1)
+    UNREGISTER_MODULE(pPluginManager, NFIHelloWorld1, NFCHelloWorld1)
 }

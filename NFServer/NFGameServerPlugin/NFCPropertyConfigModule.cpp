@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//    @FileName      :    NFCPropertyConfigModule.cpp
+//    @FileName			:    NFCPropertyConfigModule.cpp
 //    @Author           :    LvSheng.Huang
 //    @Date             :    2013-09-30
 //    @Module           :    NFCPropertyConfigModule
@@ -26,26 +26,24 @@ bool NFCPropertyConfigModule::Execute()
 
 bool NFCPropertyConfigModule::AfterInit()
 {
-    m_pLogicClassModule = pPluginManager->FindModule<NFILogicClassModule>("NFCLogicClassModule");
-    m_pElementInfoModule = pPluginManager->FindModule<NFIElementInfoModule>("NFCElementInfoModule");
-
-    assert(NULL != m_pLogicClassModule);
-    assert(NULL != m_pElementInfoModule);
+    m_pClassModule = pPluginManager->FindModule<NFIClassModule>();
+    m_pElementModule = pPluginManager->FindModule<NFIElementModule>();
 
     Load();
 
     return true;
 }
 
-int NFCPropertyConfigModule::CalculateBaseValue(const NFJobType nJob, const int nLevel, const std::string& strProperty)
+NFINT64 NFCPropertyConfigModule::CalculateBaseValue(const int nJob, const int nLevel, const std::string& strProperty)
 {
-    if (nJob >= 0 && nJob < NFJobType::NJT_MAX)
-    {
-        NF_SHARE_PTR<std::string> pstrEffectData = mhtCoefficienData[nJob].GetElement(nLevel);
-        if (pstrEffectData.get())
-        {
-            return m_pElementInfoModule->GetPropertyInt(*pstrEffectData, strProperty);
-        }
+	NF_SHARE_PTR <NFMapEx<int, std::string> > xPropertyMap = mhtCoefficienData.GetElement(nJob);
+	if (xPropertyMap)
+	{
+		NF_SHARE_PTR<std::string> xRefPropertyIDName = xPropertyMap->GetElement(nLevel);
+		if (xRefPropertyIDName)
+		{
+			return m_pElementModule->GetPropertyInt(*xRefPropertyIDName, strProperty);
+		}
     }
 
     return 0;
@@ -53,35 +51,51 @@ int NFCPropertyConfigModule::CalculateBaseValue(const NFJobType nJob, const int 
 
 void NFCPropertyConfigModule::Load()
 {
-    NF_SHARE_PTR<NFILogicClass> pLogicClass = m_pLogicClassModule->GetElement(NFrame::InitProperty::ThisName());
-    if (pLogicClass.get())
+    NF_SHARE_PTR<NFIClass> xLogicClass = m_pClassModule->GetElement(NFrame::InitProperty::ThisName());
+    if (xLogicClass)
     {
-        NFList<std::string>& xList = pLogicClass->GetConfigNameList();
-        std::string strData;
-        bool bRet = xList.First(strData);
-        while (bRet)
-        {
-            NF_SHARE_PTR<NFIPropertyManager> pPropertyManager = m_pElementInfoModule->GetPropertyManager(strData);
-            if (pPropertyManager.get())
-            {
-                int nJob = m_pElementInfoModule->GetPropertyInt(strData, NFrame::InitProperty::Job());
-                int nLevel = m_pElementInfoModule->GetPropertyInt(strData, NFrame::InitProperty::Level());
-                std::string strEffectData = m_pElementInfoModule->GetPropertyString(strData, NFrame::InitProperty::EffectData());
-                mhtCoefficienData[nJob].AddElement(nLevel, NF_SHARE_PTR<std::string>(NF_NEW std::string(strEffectData)));
-            }
+		const std::vector<std::string>& strIdList = xLogicClass->GetIDList();
+		for (int i = 0; i < strIdList.size(); ++i)
+		{
+			const std::string& strId = strIdList[i];
 
-            bRet = xList.Next(strData);
+            NF_SHARE_PTR<NFIPropertyManager> pPropertyManager = m_pElementModule->GetPropertyManager(strId);
+            if (pPropertyManager)
+            {
+                int nJob = m_pElementModule->GetPropertyInt32(strId, NFrame::InitProperty::Job());
+                int nLevel = m_pElementModule->GetPropertyInt32(strId, NFrame::InitProperty::Level());
+                std::string strEffectData = m_pElementModule->GetPropertyString(strId, NFrame::InitProperty::EffectData());
+
+				NF_SHARE_PTR <NFMapEx<int, std::string> > xPropertyMap = mhtCoefficienData.GetElement(nJob);
+				if (!xPropertyMap)
+				{
+					xPropertyMap = NF_SHARE_PTR<NFMapEx<int, std::string>>(NF_NEW NFMapEx<int, std::string>());
+					mhtCoefficienData.AddElement(nJob, xPropertyMap);
+
+					NF_SHARE_PTR<std::string> xRefPropertyIDName = xPropertyMap->GetElement(nLevel);
+					if (!xRefPropertyIDName)
+					{
+						xRefPropertyIDName = NF_SHARE_PTR<std::string>(NF_NEW std::string(strEffectData));
+						xPropertyMap->AddElement(nLevel, xRefPropertyIDName);
+					}
+				}
+            }
         }
     }
 }
 
-bool NFCPropertyConfigModule::LegalLevel(const NFJobType nJob, const int nLevel)
+bool NFCPropertyConfigModule::LegalLevel(const int nJob, const int nLevel)
 {
-    NF_SHARE_PTR<std::string> strEffectData = mhtCoefficienData[nJob].GetElement(nLevel);
-    if (strEffectData.get())
-    {
-        return true;
-    }
+	NF_SHARE_PTR <NFMapEx<int, std::string> > xPropertyMap = mhtCoefficienData.GetElement(nJob);
+	if (xPropertyMap)
+	{
+		NF_SHARE_PTR<std::string> xRefPropertyIDName = xPropertyMap->GetElement(nLevel);
+		if (xRefPropertyIDName)
+		{
+			return true;
+		}
+	}
+
 
     return false;
 }

@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//    @FileName      :    HelloWorld3.h
+//    @FileName			:    HelloWorld3.h
 //    @Author           :    LvSheng.Huang
 //    @Date             :    2014-05-14 08:51
 //    @Module           :   HelloWorld3
@@ -10,14 +10,21 @@
 #define NFC_HELLO_WORLD3_H
 
 #include "NFComm/NFPluginModule/NFIKernelModule.h"
-#include "NFComm/NFPluginModule/NFIElementInfoModule.h"
-#include "NFComm/NFPluginModule/NFIPluginManager.h"
+#include "NFComm/NFPluginModule/NFIElementModule.h"
+#include "NFComm/NFPluginModule/NFIEventModule.h"
+#include "NFComm/NFPluginModule/NFIScheduleModule.h"
 
-class HelloWorld3Module
-    : public NFILogicModule
+class NFIHelloWorld3Module
+	: public NFIModule
+{
+
+};
+
+class NFCHelloWorld3Module
+    : public NFIHelloWorld3Module
 {
 public:
-    HelloWorld3Module(NFIPluginManager* p)
+    NFCHelloWorld3Module(NFIPluginManager* p)
     {
         pPluginManager = p;
     }
@@ -31,18 +38,20 @@ public:
     virtual bool Shut();
 
 protected:
-    int OnEvent(const NFGUID& self, const int event, const NFIDataList& arg);
-    int OnClassCallBackEvent(const NFGUID& self, const std::string& strClassName, const CLASS_OBJECT_EVENT event, const NFIDataList& arg);
-    int OnPropertyCallBackEvent( const NFGUID& self, const std::string& strProperty, const NFIDataList::TData& oldVarList, const NFIDataList::TData& newVarList );
-    int OnPropertyStrCallBackEvent( const NFGUID& self, const std::string& strProperty, const NFIDataList::TData& oldVarList, const NFIDataList::TData& newVarList );
+    int OnEvent(const NFGUID& self, const NFEventDefine event, const NFDataList& arg);
+    int OnClassCallBackEvent(const NFGUID& self, const std::string& strClassName, const CLASS_OBJECT_EVENT event, const NFDataList& arg);
+    int OnPropertyCallBackEvent( const NFGUID& self, const std::string& strProperty, const NFData& oldVarList, const NFData& newVarList);
+    int OnPropertyStrCallBackEvent( const NFGUID& self, const std::string& strProperty, const NFData& oldVarList, const NFData& newVarList);
 
     int OnHeartBeat(const NFGUID& self, const std::string& strHeartBeat, const float fTime, const int nCount);
 
 protected:
-    unsigned long mLastTime;
+    int64_t mLastTime;
 protected:
     NFIKernelModule* m_pKernelModule;
-    NFIElementInfoModule* m_pElementInfoModule;
+    NFIElementModule* m_pElementModule;
+	NFIEventModule* m_pEventModule;
+	NFIScheduleModule* m_pScheduleModule;
 };
 
 #endif

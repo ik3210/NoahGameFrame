@@ -17,6 +17,12 @@
 #define NF_ENDIAN_LITTLE 1
 #define NF_ENDIAN_BIG 2
 
+#define NF_ENABLE_SSL 0
+
+#if NF_ENABLE_SSL
+#define EVENT__HAVE_OPENSSL
+#endif
+
 #define NF_ARCHITECTURE_32 1
 #define NF_ARCHITECTURE_64 2
 
@@ -68,7 +74,7 @@
 #elif defined( __WIN32__ ) || defined( _WIN32 ) || defined(_WINDOWS) || defined(WIN) || defined(_WIN64) || defined( __WIN64__ )
 #   define NF_PLATFORM NF_PLATFORM_WIN
 //////////////////////////////////////////////////////////////////////////
-#elif defined( __APPLE_CC__)
+#elif defined( __APPLE_CC__) || defined(__APPLE__) || defined(__OSX__)
 // Device                                                     Simulator
 // Both requiring OS version 4.0 or greater
 #   if __ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__ >= 40000 || __IPHONE_OS_VERSION_MIN_REQUIRED >= 40000
@@ -124,6 +130,7 @@
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 #endif
 
+#pragma warning(disable:4091) 
 #include <Windows.h>
 #define NF_EXPORT extern "C"  __declspec(dllexport)
 
@@ -244,6 +251,7 @@
 #endif
 
 #include <stdint.h>
+#include <chrono>
 
 // Integer formats of fixed bit width
 typedef uint32_t NFUINT32;
@@ -254,7 +262,7 @@ typedef int16_t NFINT16;
 typedef int8_t NFINT8;
 typedef uint64_t NFUINT64;
 typedef int64_t NFINT64;
-
+typedef int64_t NFSOCK;
 
 #if NF_PLATFORM == NF_PLATFORM_WIN
 #include <crtdbg.h>
@@ -262,7 +270,7 @@ typedef int64_t NFINT64;
 #define NFASSERT(exp_, msg_, file_, func_)  \
     std::string strInfo("Message:");        \
     strInfo += msg_ + std::string(" don't exist or some warning") + std::string("\n\nFile:") + std::string(file_) + std::string("\n Function:") + func_; \
-    MessageBox(0, TEXT(strInfo.c_str()), TEXT("Error_"#exp_), MB_RETRYCANCEL | MB_ICONERROR); \
+    MessageBoxA(0, strInfo.c_str(), ("Error_"#exp_), MB_RETRYCANCEL | MB_ICONERROR); \
     assert(0);
 #else
 #define NFASSERT(exp_, msg_, file_, func_)
@@ -272,40 +280,44 @@ typedef int64_t NFINT64;
 //#define GOOGLE_GLOG_DLL_DECL=
 
 ///////////////////////////////////////////////////////////////
+#include <string>
+#include <algorithm>
+#include <cmath>
 #include <time.h>
 #include <sstream>
+#include <stdio.h>
+#include <common/lexical_cast.hpp>
 
-inline unsigned long NF_GetTickCount()
-{
-#if NF_PLATFORM == NF_PLATFORM_WIN
-    return GetTickCount();
+#ifndef _MSC_VER
+#include <sys/time.h>
+#include <unistd.h>
+#define EPOCHFILETIME 11644473600000000ULL
 #else
-    struct timespec ts;
-
-    clock_gettime(CLOCK_MONOTONIC, &ts);
-
-    return (ts.tv_sec * 1000 + ts.tv_nsec / 1000000);
+#include <windows.h>
+#include <time.h>
+#include <process.h>
+#define EPOCHFILETIME 11644473600000000Ui64
 #endif
 
-}
 
 #if NF_PLATFORM == NF_PLATFORM_WIN
 #define NFSPRINTF sprintf_s
 #define NFSTRICMP stricmp
 #define NFSLEEP(s) Sleep(s)
+#define NFGetPID() lexical_cast<std::string>(getpid())
 #else
 #define NFSPRINTF snprintf
 #define NFSTRICMP strcasecmp
 #define NFSLEEP(s) usleep(s)
+#define NFGetPID() lexical_cast<std::string>(getpid())
 #endif
-
-
-//use actor mode--begin
-#define NF_ACTOR_THREAD_COUNT 1
 
 #ifndef NF_DYNAMIC_PLUGIN
 #define NF_DYNAMIC_PLUGIN
 #endif
+
+//use actor mode--begin
+#define NF_ACTOR_THREAD_COUNT 1
 
 #ifndef NF_USE_ACTOR
 #define NF_USE_ACTOR
@@ -326,12 +338,12 @@ inline unsigned long NF_GetTickCount()
 #endif
 //use actor mode--end
 
+#define GET_CLASS_NAME(className) (#className)
 
 #define NF_SHARE_PTR std::shared_ptr
 #define NF_NEW new
 
-#include <string>
-#include <common/lexical_cast.hpp>
+
 template<typename DTYPE>
 bool NF_StrTo(const std::string& strValue, DTYPE& nValue)
 {
@@ -347,5 +359,28 @@ bool NF_StrTo(const std::string& strValue, DTYPE& nValue)
 
     return false;
 }
+
+inline bool IsZeroFloat(const float fValue, float epsilon = 1e-6)
+{
+    return std::abs(fValue) <= epsilon;
+}
+
+inline bool IsZeroDouble(const double dValue, double epsilon = 1e-15)
+{
+    return std::abs(dValue) <= epsilon;
+}
+
+inline int64_t NFGetTime()
+{
+	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+}
+//Protobuf Using Dlls
+#if NF_PLATFORM == NF_PLATFORM_WIN
+#ifndef PROTOBUF_SRC
+#ifndef PROTOBUF_USE_DLLS
+#define PROTOBUF_USE_DLLS
+#endif
+#endif
+#endif
 
 #endif

@@ -1,19 +1,19 @@
 // -------------------------------------------------------------------------
-//    @FileName      :    NFIPropertyTrailModule.h
+//    @FileName			:    NFIPropertyTrailModule.h
 //    @Author           :    LvSheng.Huang
 //    @Date             :    2013-09-30
 //    @Module           :    NFIPropertyTrailModule
 //
 // -------------------------------------------------------------------------
 
-#ifndef _NFI_PROPERTY_TRAIL_MODULE_H
-#define _NFI_PROPERTY_TRAIL_MODULE_H
+#ifndef NFI_PROPERTY_TRAIL_MODULE_H
+#define NFI_PROPERTY_TRAIL_MODULE_H
 
 #include <iostream>
-#include "NFILogicModule.h"
+#include "NFIModule.h"
 
 class NFIPropertyTrailModule
-    : public NFILogicModule
+    : public NFIModule
 {
 public:
     virtual void StartTrail(const NFGUID self) = 0;

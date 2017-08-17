@@ -47,6 +47,8 @@
 class NFIMysqlDriver
 {
 public:
+	virtual ~NFIMysqlDriver() {}
+	
     virtual bool Connect(const std::string& strDBName, const std::string& strDBHost, const int nDBPort, const std::string& strDBUser, const std::string& strDBPwd) = 0;
     virtual  bool Execute() = 0;
     virtual mysqlpp::Connection* GetConnection() = 0;
@@ -65,4 +67,4 @@ public:
     virtual bool Keys(const std::string& strRecordName, const std::string& strKeyName, std::vector<std::string>& valueVec) = 0;
 };
 
-#endif // !__NFI_REDIS_DRIVER_MODULE_H__
+#endif // !_NFI_REDIS_DRIVER_MODULE_H_

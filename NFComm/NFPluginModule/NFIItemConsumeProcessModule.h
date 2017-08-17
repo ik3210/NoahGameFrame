@@ -1,29 +1,34 @@
 // -------------------------------------------------------------------------
-//    @FileName      :   NFIItemConsumeProcessModule.h
+//    @FileName      	:   NFIItemConsumeProcessModule.h
 //    @Author           :   LvSheng.Huang
-//    @Date             :   2013-09-28
+//    @Date             :   2017-02-16
 //    @Module           :   NFIItemConsumeProcessModule
-//    @Desc             :   道具消费机制类,详细的具体某类道具消费流程以及扣除机制
+
 // -------------------------------------------------------------------------
 
-#ifndef _NFI_ITEMCONSUME_PROCESS_MODULE_H
-#define _NFI_ITEMCONSUME_PROCESS_MODULE_H
+#ifndef NFI_ITEM_CONSUME_PROCESS_MODULE_H
+#define NFI_ITEM_CONSUME_PROCESS_MODULE_H
 
 #include <iostream>
-#include "NFILogicModule.h"
-#include "NFComm/Define/NFItem_def.h"
+#include "NFIModule.h"
+#ifdef _MSC_VER
+#pragma warning(disable: 4244 4267)
+#endif
 #include "NFComm/NFMessageDefine/NFDefine.pb.h"
+#ifdef _MSC_VER
+#pragma warning(default: 4244 4267)
+#endif
 
 class NFIItemConsumeProcessModule
-    : public NFILogicModule
+    : public NFIModule
 {
 public:
 
-    //物品使用是否合法
-    virtual int ConsumeLegal(const NFGUID& self, const std::string& strItemName, const NFGUID& targetID) = 0;
+	// > 0, error code
+    virtual int ConsumeLegal(const NFGUID& self, const std::string& strItemID, const NFDataList& targetID) = 0;
 
-    //合法,消耗,那么处理过程[消耗后,nItemRowID已经找不到了，因为可能被清空了]
-    virtual int ConsumeProcess(const NFGUID& self, const std::string& strItemName, const NFGUID& targetID) = 0;
+	//> 0, error code
+    virtual int ConsumeProcess(const NFGUID& self, const std::string& strItemID, const NFDataList& targetID) = 0;
 
 };
 

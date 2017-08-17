@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//    @FileName      :    NFCPropertyModule.h
+//    @FileName			:    NFCPropertyModule.h
 //    @Author           :    LvSheng.Huang
 //    @Date             :    2013-07-05
 //    @Module           :    NFCPropertyModule
@@ -10,10 +10,9 @@
 #define NFC_PROPERTY_MODULE_H
 
 #include "NFComm/NFPluginModule/NFIKernelModule.h"
-#include "NFComm/NFPluginModule/NFIGameLogicModule.h"
 #include "NFComm/NFPluginModule/NFIPropertyModule.h"
-#include "NFComm/NFPluginModule/NFIElementInfoModule.h"
-#include "NFComm/NFPluginModule/NFILogicClassModule.h"
+#include "NFComm/NFPluginModule/NFIElementModule.h"
+#include "NFComm/NFPluginModule/NFIClassModule.h"
 #include "NFComm/NFPluginModule/NFIPropertyConfigModule.h"
 #include "NFComm/NFPluginModule/NFIPluginManager.h"
 #include "NFComm/NFMessageDefine/NFProtocolDefine.hpp"
@@ -35,46 +34,45 @@ public:
 
     virtual int RefreshBaseProperty(const NFGUID& self);
 
-    virtual int GetPropertyValue(const NFGUID& self, const std::string& strPropertyName, const NFPropertyGroup eGroupType);
-    virtual int SetPropertyValue(const NFGUID& self, const std::string& strPropertyName, const NFPropertyGroup eGroupType, const int nValue);
+    virtual int64_t GetPropertyValue(const NFGUID& self, const std::string& strPropertyName, const NFPropertyGroup eGroupType);
+    virtual int SetPropertyValue(const NFGUID& self, const std::string& strPropertyName, const NFPropertyGroup eGroupType, const int64_t nValue);
 
-    virtual int AddPropertyValue(const NFGUID& self, const std::string& strPropertyName, const NFPropertyGroup eGroupType, const int nValue);
-    virtual int SubPropertyValue(const NFGUID& self, const std::string& strPropertyName, const NFPropertyGroup eGroupType, const int nValue);
+    virtual bool AddPropertyValue(const NFGUID& self, const std::string& strPropertyName, const NFPropertyGroup eGroupType, const int64_t nValue);
 
     virtual bool FullHPMP(const NFGUID& self);
-    virtual bool AddHP(const NFGUID& self, const NFINT64& nValue);
-    virtual bool ConsumeHP(const NFGUID& self, const NFINT64& nValue);
-    virtual bool EnoughHP(const NFGUID& self, const NFINT64& nValue);
+    virtual bool AddHP(const NFGUID& self, const int nValue);
+    virtual bool ConsumeHP(const NFGUID& self, const int nValue);
+    virtual bool EnoughHP(const NFGUID& self, const int nValue);
 
-    virtual bool AddMP(const NFGUID& self, const NFINT64& nValue);
-    virtual bool ConsumeMP(const NFGUID& self, const NFINT64& nValue);
-    virtual bool EnoughMP(const NFGUID& self, const NFINT64& nValue);
+    virtual bool AddMP(const NFGUID& self, const int nValue);
+    virtual bool ConsumeMP(const NFGUID& self, const int nValue);
+    virtual bool EnoughMP(const NFGUID& self, const int nValue);
 
     virtual bool FullSP(const NFGUID& self);
-    virtual bool AddSP(const NFGUID& self, const NFINT64& nValue);
-    virtual bool ConsumeSP(const NFGUID& self, const NFINT64& nValue);
-    virtual bool EnoughSP(const NFGUID& self, const NFINT64& nValue);
+    virtual bool AddSP(const NFGUID& self, const int nValue);
+    virtual bool ConsumeSP(const NFGUID& self, const int nValue);
+    virtual bool EnoughSP(const NFGUID& self, const int nValue);
 
-    virtual bool AddMoney(const NFGUID& self, const NFINT64& nValue);
-    virtual bool ConsumeMoney(const NFGUID& self, const NFINT64& nValue);
-    virtual bool EnoughMoney(const NFGUID& self, const NFINT64& nValue);
+    virtual bool AddGold(const NFGUID& self, const int64_t nValue);
+    virtual bool ConsumeGold(const NFGUID& self, const int64_t nValue);
+    virtual bool EnoughGold(const NFGUID& self, const int64_t nValue);
 
-    virtual bool AddDiamond(const NFGUID& self, const NFINT64& nValue);
-    virtual bool ConsumeDiamond(const NFGUID& self, const NFINT64& nValue);
-    virtual bool EnoughDiamond(const NFGUID& self, const NFINT64& nValue);
+    virtual bool AddDiamond(const NFGUID& self, const int nValue);
+    virtual bool ConsumeDiamond(const NFGUID& self, const int nValue);
+    virtual bool EnoughDiamond(const NFGUID& self, const int nValue);
 
 protected:
-    int OnObjectClassEvent(const NFGUID& self, const std::string& strClassName, const CLASS_OBJECT_EVENT eClassEvent, const NFIDataList& var);
+    int OnObjectClassEvent(const NFGUID& self, const std::string& strClassName, const CLASS_OBJECT_EVENT eClassEvent, const NFDataList& var);
 
-    int OnObjectLevelEvent(const NFGUID& self, const std::string& strPropertyName, const NFIDataList::TData& oldVar, const NFIDataList::TData& newVar);
+    int OnObjectLevelEvent(const NFGUID& self, const std::string& strPropertyName, const NFData& oldVar, const NFData& newVar);
 
-    int OnRecordPropertyEvent(const NFGUID& self, const RECORD_EVENT_DATA& xEventData, const NFIDataList::TData& oldVar, const NFIDataList::TData& newVar);
+    int OnRecordEvent(const NFGUID& self, const RECORD_EVENT_DATA& xEventData, const NFData& oldVar, const NFData& newVar);
 
 private:
     NFIKernelModule* m_pKernelModule;
     NFIPropertyConfigModule* m_pPropertyConfigModule;
-    NFIElementInfoModule* m_pElementInfoModule;
-    NFILogicClassModule* m_pLogicClassModule;
+    NFIElementModule* m_pElementModule;
+    NFIClassModule* m_pClassModule;
     NFILevelModule* m_pLevelModule;
 };
 

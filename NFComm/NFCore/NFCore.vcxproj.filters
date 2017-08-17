@@ -9,25 +9,21 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{6790f136-7d33-4974-a041-1b9e1b73b615}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Unit">
+      <UniqueIdentifier>{79f51951-d5bb-48f2-b1d4-569c3e7acdb0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="NFCore.h" />
     <ClInclude Include="NFCRecord.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NFDefine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NFIObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NFIRecord.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NFList.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NFMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="NFIRecordManager.h">
@@ -48,60 +44,62 @@
     <ClInclude Include="NFIProperty.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NFSingleton.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NFCHeartBeatManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NFIHeartBeatManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NFCComponentManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NFIComponent.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NFIComponentManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NFTimer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="NFQueue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="NFCObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NFCDataList.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="NFVector3.hpp">
+      <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="NFIDataList.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="NFVector2.hpp">
+      <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="NFMapEx.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="NFBox.hpp">
+      <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="NFCConsistentHash.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="NFLine.hpp">
+      <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="NFCMemManger.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="NFPlane.hpp">
+      <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="NFCAddConsistentHash.hpp">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="NFRay.hpp">
+      <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="NFCEventManager.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="NFSphere.hpp">
+      <Filter>Math</Filter>
     </ClInclude>
-    <ClInclude Include="NFIEventManager.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="NFMapEx.hpp">
+      <Filter>Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="NFList.hpp">
+      <Filter>Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="NFSpaceNode.hpp">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="NFDateTime.hpp">
+      <Filter>Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="NFException.hpp">
+      <Filter>Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="NFMemoryCounter.hpp">
+      <Filter>Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="NFSingleton.hpp">
+      <Filter>Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="NFDataList.hpp">
+      <Filter>Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="NFMemManager.hpp">
+      <Filter>Unit</Filter>
+    </ClInclude>
+    <ClInclude Include="NFConsistentHash.hpp">
+      <Filter>Unit</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="NFCore.cpp" />
     <ClCompile Include="NFCRecord.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -114,26 +112,8 @@
     <ClCompile Include="NFCProperty.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NFCHeartBeatManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="NFCComponentManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="NFTimer.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="NFCObject.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="NFCDataList.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="NFCMemManger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="NFCEventManager.cpp">
-      <Filter>Header Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -30,17 +30,15 @@ const int NFLoginNet_ClientPlugin::GetPluginVersion()
 
 const std::string NFLoginNet_ClientPlugin::GetPluginName()
 {
-    return GET_CLASS_NAME(NFLoginNet_ClientPlugin)
+	return GET_CLASS_NAME(NFLoginNet_ClientPlugin);
 }
 
-       void NFLoginNet_ClientPlugin::Install()
+void NFLoginNet_ClientPlugin::Install()
 {
-    //NFILogicModule* pModule = new NFCLoginNet_ClientModule();
-
-    REGISTER_MODULE(pPluginManager, NFCLoginToMasterModule)
+    REGISTER_MODULE(pPluginManager, NFILoginToMasterModule, NFCLoginToMasterModule)
 }
 
 void NFLoginNet_ClientPlugin::Uninstall()
 {
-    UNREGISTER_MODULE(pPluginManager, NFCLoginToMasterModule)
+    UNREGISTER_MODULE(pPluginManager, NFILoginToMasterModule, NFCLoginToMasterModule)
 }

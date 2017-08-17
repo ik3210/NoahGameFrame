@@ -1,20 +1,20 @@
 // -------------------------------------------------------------------------
-//    @FileName         £º    NFITagModule.h
-//    @Author           £º    LvSheng.Huang
-//    @Date             £º    2012-12-15
-//    @Module           £º    NFITagModule
-//
+//    @Author           :    LvSheng.Huang
+//    @Date             :    2016-12-27
+//    @Module           :    NFITaskModule
+//    @Desc             :
 // -------------------------------------------------------------------------
 
-#ifndef _NFI_TAG_MODULE_H
-#define _NFI_TAG_MODULE_H
+
+#ifndef NFI_TAG_MODULE_H
+#define NFI_TAG_MODULE_H
 
 #include <iostream>
-#include "NFILogicModule.h"
+#include "NFIModule.h"
 
 
 class NFITagModule
-    : public NFILogicModule
+    : public NFIModule
 {
 
 public:

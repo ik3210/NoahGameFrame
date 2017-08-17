@@ -1,9 +1,15 @@
 # NoahGameFrame
-##### Copyright © http://www.noahframe.com
+#####  http://www.noahframe.com
+##### Forum: http://bbs.noahframe.com/forum.php
 
+- develop
+[![Build Status](https://travis-ci.org/ketoo/NoahGameFrame.svg?branch=develop)](https://travis-ci.org/ketoo/NoahGameFrame)
+- master
+[![Build Status](https://travis-ci.org/ketoo/NoahGameFrame.svg?branch=master)](https://travis-ci.org/ketoo/NoahGameFrame)
+- chat
 [![Join the chat at https://gitter.im/ketoo/NoahGameFrame](https://badges.gitter.im/ketoo/NoahGameFrame.svg)](https://gitter.im/ketoo/NoahGameFrame?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-#####交流QQ群：341159815
+#####QQ Group：341159815
 
 ## What is it?
 
@@ -19,19 +25,15 @@ NF is a lightweight, fast, scalable, distributed plugin framework.Greatly inspir
 - With existing c++, c# game client for rapid development
 - Cross-platform
 
+## Toturial 
 
+[Toturial](http://bbs.noahframe.com/forum.php?mod=forumdisplay&fid=39) : http://bbs.noahframe.com/forum.php?mod=forumdisplay&fid=39
 
-### FAQ
-[FAQ](http://blog.noahframe.com/?p=229)
+### FAQ OR DISCUSS
+[FAQ](http://blog.noahframe.com/?p=229) : http://blog.noahframe.com/?p=229
 
 ### Unity3D client
-[U3D Client](https://github.com/ketoo/NoahGameFrame/tree/master/_Out/Server/ClientBin/source)
-
-## Introduction
-[English PDF](https://github.com/ketoo/NoahGameFrame/blob/develop/Introduce/NFrame_Introduction_EN_US.pdf) / [English PPT](https://github.com/ketoo/NoahGameFrame/blob/develop/Introduce/NFrame_Introduction_EN_US.ppt)
-
-[中文简体 PDF](https://github.com/ketoo/NoahGameFrame/blob/develop/Introduce/NFrame_Introduction_ZH_CN.pdf) / [中文简体 PPT](https://github.com/ketoo/NoahGameFrame/blob/develop/Introduce/NFrame_Introduction_ZH_CN.ppt)
-
+[U3D Client](https://github.com/ketoo/NoahGameFrame/tree/master/NFClient/Unity3D)
 
 ## Architecture
 
@@ -40,9 +42,6 @@ NF is a lightweight, fast, scalable, distributed plugin framework.Greatly inspir
 
 ### Server Architecture
 ![Server Architecture](https://github.com/ketoo/NoahGameFrame/blob/develop/Introduce/img/NF_server_arch.png)
-
-### Event Driver:
-![Event Driver](https://github.com/ketoo/NoahGameFrame/blob/develop/Introduce/img/NF_Event_driver.png)
 
 ## Get the Sources:
 
@@ -59,7 +58,6 @@ svn checkout https://github.com/ketoo/NoahGameFrame
 - easylogging++ 9.80
 - mysql++ 3.2.2
 - google protobuf 2.5.0
-- pybind11 1.2
 - redis-cpp-client 
 - Theron 6.00.01
 - curl 7.37.1
@@ -67,27 +65,35 @@ svn checkout https://github.com/ketoo/NoahGameFrame
 ## Supported Compilers
 
 * GCC >= 4.8 (**Tested in Ubuntu 15.04**)
-* MSVC >= VS2013 (**Tested in Win7/10**)
+* MSVC >= VS2015 (**Tested in Win7/10**)
 
 ## Build and Install
-### Windows[MSVC >= 2013]
+### MSVC >= 2015
 
 1. Git pull all source
-2. Run **install.bat**
-3. Open the solution: **NoahFrame.sln**
-4. Build the solution
-5. Run **_Out/Server/NFDataCfg/Tool/FileProcess.exe** to generate configuration files
-6. Run the binary file by **_Out/Server/Debug/Run.bat**
+2. Run **install4vs.bat**
+3. Open the solution: **NoahFrame.sln**, build FileProcessTool project
+4. Run **GenerateConfigXML.bat** to generate configuration files
+5. Open the solution: **NoahFrame.sln**
+6. Build the solution(if u build failed, please build again(not rebuild))
+7. Run the binary file by **_Out/rund.bat**
 
-### Linux[CodeBlocks >= 13.1]
+### CodeBlocks >= 13.1(Only in linux)
 
 1. Git pull all source
 2. Run **install.sh**
 3. Open the solution with CodeBlocks: **NF.workspace**
 4. Check **C++11** option in CodeBlocks compiler setting
 5. Build **NF.workspace**
-6. Run the binary file by **_Out/Server/Debug/rund.sh**
+6. Run **sh ./GenerateConfigXML.sh** to generate configuration files
+7. Run the binary file by **_Out/rund.sh**
 
+### CMake
+1. Git pull all source
+2. Install cmake[>= 3.1] please choose options for installing: **Add CMake to the system PATH for all users and restart your computer**
+3. Install VS2015 or gcc[>= 4.8]
+4. Run **install4cmake.bat** or **install4cmake.sh** to build NF
+5. Run the binary file by **_Out/rund.bat** or **_Out/rund.sh**
 
 ### JAVA Project
 WebSite:  https://github.com/NFGameTeam/NFrame-java
@@ -100,7 +106,7 @@ WebSite:  https://github.com/ketoo/NFrame
 ## Documents & Tutorial
 [English](https://github.com/ketoo/NoahGameFrame/blob/develop/doc_EN_US.md)
 
-[中文简体](https://github.com/ketoo/NoahGameFrame/blob/develop/doc_ZH_CN.md)
+[Mandarin](https://github.com/ketoo/NoahGameFrame/blob/develop/doc_ZH_CN.md)
 
 ## License
 The NFrame project is currently available under the [Apache License](https://github.com/ketoo/NoahGameFrame/blob/develop/LICENSE).
@@ -114,20 +120,20 @@ Tutorial:
 ```cpp
 
 // -------------------------------------------------------------------------
-//    @FileName      :    HelloWorld1.h
+//    @FileName      	:    HelloWorld1.h
 //    @Author           :    ketoo
 //    @Date             :    2014-05-01 08:51
 //    @Module           :   HelloWorld1
 //
 // -------------------------------------------------------------------------
 
-#ifndef _NFC_HELLO_WORLD1_H_
-#define _NFC_HELLO_WORLD1_H_
+#ifndef NFC_HELLO_WORLD1_H
+#define NFC_HELLO_WORLD1_H
 
 #include "NFComm/NFPluginModule/NFIPluginManager.h"
 
 class HelloWorld1
-    : public NFILogicModule
+    : public NFIModule
 {
 public:
     HelloWorld1(NFIPluginManager* p)
@@ -138,7 +144,7 @@ public:
     virtual bool Init();
     virtual bool AfterInit();
 
-    virtual bool Execute(const float fLasFrametime, const float fStartedTime);
+    virtual bool Execute();
 
     virtual bool BeforeShut();
     virtual bool Shut();
@@ -170,7 +176,7 @@ bool HelloWorld1::AfterInit()
     return true;
 }
 
-bool HelloWorld1::Execute( const float fLasFrametime, const float fStartedTime )
+bool HelloWorld1::Execute()
 {
     // Execute is called once per frame
 	
@@ -216,12 +222,31 @@ bool HelloWorld1::Shut()
 * how to use the asynchronous events
 * use multiple cpus to get high performance
 
+
+-------------------
+### About The Author
+
+* Mail: 342006@qq.com
+* BBS: http://bbs.noahframe.com
+
+
+### WELCOME DONATE/欢迎捐赠(支付宝):
+
+![donation](https://github.com/ketoo/NoahGameFrame/blob/develop/Introduce/donation.png)
+
 -------------------
 
+### Amazing  open source projects:
+**breeze**
+* Auther: zsummer
+* Github: https://github.com/zsummer/breeze
+* Description:A fast, scalable, distributed game server framework for C++
 
 
-
-
+**gce**
+* Auther: nousxiong
+* GitHub: https://github.com/nousxiong/gce
+* Description: The Game Communication Environment (GCE) is an actor model framework for online game development.
 
 
 

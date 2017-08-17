@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//    @FileName      :    HelloWorld2.h
+//    @FileName			:    HelloWorld2.h
 //    @Author           :    LvSheng.Huang
 //    @Date             :    2014-05-14 08:51
 //    @Module           :   HelloWorld2
@@ -11,12 +11,17 @@
 
 #include "NFComm/NFPluginModule/NFIPlugin.h"
 #include "NFComm/NFPluginModule/NFIPluginManager.h"
+class NFIHelloWorld2
+	: public NFIModule
+{
 
-class HelloWorld2
-    : public NFILogicModule
+};
+
+class NFCHelloWorld2
+    : public NFIHelloWorld2
 {
 public:
-    HelloWorld2(NFIPluginManager* p)
+    NFCHelloWorld2(NFIPluginManager* p)
     {
         pPluginManager = p;
     }
@@ -30,7 +35,7 @@ public:
     virtual bool Shut();
 
 protected:
-    int OnPropertyCallBackEvent(const NFGUID& self, const std::string& strProperty, const NFIDataList::TData& oldVarList, const NFIDataList::TData& newVarList);
+    int OnPropertyCallBackEvent(const NFGUID& self, const std::string& strProperty, const NFData& oldVarList, const NFData& newVarList);
 
 
 

@@ -11,41 +11,46 @@
 
 #include <iostream>
 #include <assert.h>
-#include "NFComm/NFCore/NFMap.h"
-#include "NFComm/NFPluginModule/NFIActor.h"
-#include "NFComm/NFPluginModule/NFILogicModule.h"
+#include "NFComm/NFCore/NFMap.hpp"
+#include "NFComm/NFPluginModule/NFIModule.h"
 #include "NFComm/NFPluginModule/NFPlatform.h"
 #include "NFComm/NFPluginModule/NFIPluginManager.h"
 
-#define REGISTER_MODULE(pManager, className)  NFILogicModule* pRegisterModule##className= new className(pManager); \
+#define REGISTER_MODULE(pManager, classBaseName, className)  \
+	assert((TIsDerived<classBaseName, NFIModule>::Result));	\
+	assert((TIsDerived<className, classBaseName>::Result));	\
+	NFIModule* pRegisterModule##className= new className(pManager); \
     pRegisterModule##className->strName = (#className); \
-    pManager->AddModule( (#className), pRegisterModule##className );AddElement( (#className), pRegisterModule##className );
+    pManager->AddModule( #classBaseName, pRegisterModule##className );AddElement( #classBaseName, pRegisterModule##className );
 
-#define UNREGISTER_MODULE(pManager, className) NFILogicModule* pUnRegisterModule##className =  \
-        dynamic_cast<NFILogicModule*>( pManager->FindModule( (#className) ) ); pManager->RemoveModule( (#className) ); RemoveElement( (#className) ); delete pUnRegisterModule##className;
+#define UNREGISTER_MODULE(pManager, classBaseName, className) NFIModule* pUnRegisterModule##className =  \
+	dynamic_cast<NFIModule*>( pManager->FindModule( #classBaseName )); \
+	pManager->RemoveModule( #classBaseName ); RemoveElement( #classBaseName ); delete pUnRegisterModule##className;
+
 
 #define CREATE_PLUGIN(pManager, className)  NFIPlugin* pCreatePlugin##className = new className(pManager); pManager->Registered( pCreatePlugin##className );
 
-#define DESTROY_PLUGIN(pManager, className) pManager->UnsRegistered( pManager->FindPlugin((#className)) );
+#define DESTROY_PLUGIN(pManager, className) pManager->UnRegistered( pManager->FindPlugin((#className)) );
 
-#define GET_CLASS_NAME(className) (#className);
-
-
+/*
 #define REGISTER_COMPONENT(pManager, className)  NFIComponent* pRegisterComponent##className= new className(pManager); \
     pRegisterComponent##className->strName = (#className); \
     pManager->AddComponent( (#className), pRegisterComponent##className );
 
 #define UNREGISTER_COMPONENT(pManager, className) NFIComponent* pRegisterComponent##className =  \
         dynamic_cast<NFIComponent*>( pManager->FindComponent( (#className) ) ); pManager->RemoveComponent( (#className) ); delete pRegisterComponent##className;
-
+*/
 
 class NFIPluginManager;
 
-class NFIPlugin : public NFILogicModule,
-    public NFMap<std::string, NFILogicModule>
+class NFIPlugin : public NFIModule,
+    public NFMap<std::string, NFIModule>
 {
 
 public:
+	NFIPlugin()
+	{
+	}
 
     virtual const int GetPluginVersion() = 0;
 
@@ -53,14 +58,32 @@ public:
 
     virtual void Install() = 0;
 
+	virtual bool Awake()
+	{
+		NFIModule* pModule = First();
+		while (pModule)
+		{
+			bool bRet = pModule->Awake();
+			if (!bRet)
+			{
+				std::cout << pModule->strName << std::endl;
+				assert(0);
+			}
+
+			pModule = Next();
+		}
+		return true;
+	}
+
     virtual bool Init()
     {
-        NFILogicModule* pModule = First();
+        NFIModule* pModule = First();
         while (pModule)
         {
             bool bRet = pModule->Init();
             if (!bRet)
             {
+				std::cout << pModule->strName << std::endl;
                 assert(0);
             }
 
@@ -71,12 +94,13 @@ public:
 
     virtual bool AfterInit()
     {
-        NFILogicModule* pModule = First();
+        NFIModule* pModule = First();
         while (pModule)
         {
             bool bRet = pModule->AfterInit();
             if (!bRet)
             {
+				std::cout << pModule ->strName << std::endl;
                 assert(0);
             }
 
@@ -87,7 +111,7 @@ public:
 
     virtual bool CheckConfig()
     {
-        NFILogicModule* pModule = First();
+        NFIModule* pModule = First();
         while (pModule)
         {
             pModule->CheckConfig();
@@ -98,9 +122,22 @@ public:
         return true;
     }
 
+	virtual bool ReadyExecute()
+	{
+		NFIModule* pModule = First();
+		while (pModule)
+		{
+			pModule->ReadyExecute();
+
+			pModule = Next();
+		}
+
+		return true;
+	}
+
     virtual bool Execute()
     {
-        NFILogicModule* pModule = First();
+        NFIModule* pModule = First();
         while (pModule)
         {
             pModule->Execute();
@@ -113,7 +150,7 @@ public:
 
     virtual bool BeforeShut()
     {
-        NFILogicModule* pModule = First();
+        NFIModule* pModule = First();
         while (pModule)
         {
             pModule->BeforeShut();
@@ -125,7 +162,7 @@ public:
 
     virtual bool Shut()
     {
-        NFILogicModule* pModule = First();
+        NFIModule* pModule = First();
         while (pModule)
         {
             pModule->Shut();
@@ -136,10 +173,19 @@ public:
         return true;
     }
 
-    virtual void Uninstall() = 0;
+	virtual bool OnReloadPlugin()
+	{
+		NFIModule* pModule = First();
+		while (pModule)
+		{
+			pModule->OnReloadPlugin();
 
-protected:
-    NFIPluginManager* pPluginManager;
+			pModule = Next();
+		}
+
+		return true;
+	}
+    virtual void Uninstall() = 0;
 };
 
 #endif

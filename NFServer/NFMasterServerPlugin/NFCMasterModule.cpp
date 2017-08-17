@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//    @FileName      :    NFCMasterModle.cpp
+//    @FileName			:    NFCMasterModle.cpp
 //    @Author           :    LvSheng.Huang
 //    @Date             :    2013-01-02
 //    @Module           :    NFCMasterModle
@@ -12,9 +12,7 @@
 bool NFCMasterModule::Init()
 {
 
-    m_pKernelModule = pPluginManager->FindModule<NFIKernelModule>("NFCKernelModule");
-
-    assert(NULL != m_pKernelModule);
+    m_pKernelModule = pPluginManager->FindModule<NFIKernelModule>();
 
     return true;
 }

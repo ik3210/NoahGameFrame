@@ -1,19 +1,19 @@
 // -------------------------------------------------------------------------
-//    @FileName         £º    NFIGameServerScriptModule.h
-//    @Author           £º    LvSheng.Huang
-//    @Date             £º    2013-07-08
-//    @Module           £º    NFIGameServerScriptModule
+
+
+
+
 //
 // -------------------------------------------------------------------------
 
-#ifndef _NFI_GAMESERVERSCRIPT_MODULE_H
-#define _NFI_GAMESERVERSCRIPT_MODULE_H
+#ifndef NFI_GAMESERVERSCRIPT_MODULE_H
+#define NFI_GAMESERVERSCRIPT_MODULE_H
 
 #include <iostream>
-#include "NFILogicModule.h"
+#include "NFIModule.h"
 
 class NFIGameServerScriptModule
-    : public NFILogicModule
+    : public NFIModule
 {
 
 public:

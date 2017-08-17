@@ -25,16 +25,16 @@ const int Tutorial2::GetPluginVersion()
 
 const std::string Tutorial2::GetPluginName()
 {
-    return GET_CLASS_NAME(Tutorial2)
+	return GET_CLASS_NAME(Tutorial2);
 }
 
 void Tutorial2::Install()
 {
-    REGISTER_MODULE(pPluginManager, HelloWorld2)
+    REGISTER_MODULE(pPluginManager, NFIHelloWorld2, NFCHelloWorld2)
     
 }
 
 void Tutorial2::Uninstall()
 {
-    UNREGISTER_MODULE(pPluginManager, HelloWorld2)
+    UNREGISTER_MODULE(pPluginManager, NFIHelloWorld2, NFCHelloWorld2)
 }

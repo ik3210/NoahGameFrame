@@ -7,9 +7,10 @@
 		<Option compiler="gcc" />
 		<Build>
 			<Target title="Debug x64">
-				<Option output="$(SolutionDir)/_Out/Comm/Debug/NFCore_d" prefix_auto="0" extension_auto="1" />
-				<Option working_dir="" />
-				<Option type="2" />
+				<Option output="$(SolutionDir)/_Out/Debug/NFCore_d" prefix_auto="0" extension_auto="1" />
+				<Option working_dir="$(SolutionDir)/_Out/Debug" />
+				<Option object_output=".objs/Debug" />
+				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
 				<Compiler>
@@ -30,9 +31,10 @@
 				</Environment>
 			</Target>
 			<Target title="Release x64">
-				<Option output="$(SolutionDir)/_Out/Comm/Release/NFCore" prefix_auto="0" extension_auto="1" />
-				<Option working_dir="" />
-				<Option type="2" />
+				<Option output="$(SolutionDir)/_Out/Release/NFCore" prefix_auto="0" extension_auto="1" />
+				<Option working_dir="$(SolutionDir)/_Out/Release" />
+				<Option object_output=".objs/Release" />
+				<Option type="3" />
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
 				<Compiler>
@@ -49,50 +51,42 @@
 				</Environment>
 			</Target>
 		</Build>
-		<Unit filename="NFCAddConsistentHash.hpp" />
-		<Unit filename="NFCComponentManager.cpp" />
-		<Unit filename="NFCComponentManager.h" />
-		<Unit filename="NFCConsistentHash.hpp" />
-		<Unit filename="NFCDataList.cpp" />
-		<Unit filename="NFCDataList.h" />
-		<Unit filename="NFCEventManager.cpp" />
-		<Unit filename="NFCEventManager.h" />
-		<Unit filename="NFCHeartBeatManager.cpp" />
-		<Unit filename="NFCHeartBeatManager.h" />
-		<Unit filename="NFCMemManger.cpp" />
-		<Unit filename="NFCMemManger.h" />
-		<Unit filename="NFCObject.cpp" />
-		<Unit filename="NFCObject.h" />
-		<Unit filename="NFCProperty.cpp" />
-		<Unit filename="NFCProperty.h" />
-		<Unit filename="NFCPropertyManager.cpp" />
-		<Unit filename="NFCPropertyManager.h" />
-		<Unit filename="NFCRecord.cpp" />
-		<Unit filename="NFCRecord.h" />
-		<Unit filename="NFCRecordManager.cpp" />
-		<Unit filename="NFCRecordManager.h" />
-		<Unit filename="NFCore.cpp" />
-		<Unit filename="NFCore.h" />
-		<Unit filename="NFDefine.h" />
-		<Unit filename="NFIComponent.h" />
-		<Unit filename="NFIComponentManager.h" />
-		<Unit filename="NFIDataList.h" />
-		<Unit filename="NFIEventManager.h" />
-		<Unit filename="NFIHeartBeatManager.h" />
-		<Unit filename="NFIMemory.h" />
-		<Unit filename="NFIObject.h" />
-		<Unit filename="NFIProperty.h" />
-		<Unit filename="NFIPropertyManager.h" />
-		<Unit filename="NFIRecord.h" />
-		<Unit filename="NFIRecordManager.h" />
-		<Unit filename="NFList.h" />
-		<Unit filename="NFMap.h" />
-		<Unit filename="NFMapEx.h" />
-		<Unit filename="NFQueue.h" />
-		<Unit filename="NFSingleton.h" />
-		<Unit filename="NFTimer.cpp" />
-		<Unit filename="NFTimer.h" />
-		<Unit filename="ReadMe.txt" />
+<Unit filename="NFBox.hpp" />
+<Unit filename="NFCComponentManager.h" />
+<Unit filename="NFCConsistentHash.hpp" />
+<Unit filename="NFCMemManager.hpp" />
+<Unit filename="NFCObject.h" />
+<Unit filename="NFCProperty.h" />
+<Unit filename="NFCPropertyManager.h" />
+<Unit filename="NFCRecordManager.h" />
+<Unit filename="NFDataList.hpp" />
+<Unit filename="NFDateTime.hpp" />
+<Unit filename="NFException.hpp" />
+<Unit filename="NFIComponent.h" />
+<Unit filename="NFIComponentManager.h" />
+<Unit filename="NFLine.hpp" />
+<Unit filename="NFMapEx.hpp" />
+<Unit filename="NFMemoryCounter.hpp" />
+<Unit filename="NFPlane.hpp" />
+<Unit filename="NFRay.hpp" />
+<Unit filename="NFSingleton.hpp" />
+<Unit filename="NFSpaceNode.hpp" />
+<Unit filename="NFSphere.hpp" />
+<Unit filename="NFCRecord.h" />
+<Unit filename="NFIObject.h" />
+<Unit filename="NFIProperty.h" />
+<Unit filename="NFIPropertyManager.h" />
+<Unit filename="NFIRecord.h" />
+<Unit filename="NFIRecordManager.h" />
+<Unit filename="NFList.hpp" />
+<Unit filename="NFVector2.hpp" />
+<Unit filename="NFVector3.hpp" />
+<Unit filename="NFCComponentManager.cpp" />
+<Unit filename="NFCObject.cpp" />
+<Unit filename="NFCProperty.cpp" />
+<Unit filename="NFCPropertyManager.cpp" />
+<Unit filename="NFCRecordManager.cpp" />
+<Unit filename="NFCRecord.cpp" />
 		<Extensions>
 			<code_completion />
 			<envvars />

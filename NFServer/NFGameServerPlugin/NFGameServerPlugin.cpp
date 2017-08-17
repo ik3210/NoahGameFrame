@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//    @FileName      :    NFGameServerPlugin.cpp
+//    @FileName			:    NFGameServerPlugin.cpp
 //    @Author           :    LvSheng.Huang
 //    @Date             :    2012-07-14 08:51
 //    @Module           :    NFGameServerPlugin
@@ -13,16 +13,13 @@
 #include "NFCPropertyModule.h"
 #include "NFCLevelModule.h"
 #include "NFCPropertyConfigModule.h"
+#include "NFCNPCRefreshModule.h"
 
 #ifdef NF_DYNAMIC_PLUGIN
 
 NF_EXPORT void DllStartPlugin(NFIPluginManager* pm)
 {
-#if NF_PLATFORM == NF_PLATFORM_WIN
-    SetConsoleTitle("NFGameServer");
-#endif // NF_PLATFORM
     CREATE_PLUGIN(pm, NFGameServerPlugin)
-
 };
 
 NF_EXPORT void DllStopPlugin(NFIPluginManager* pm)
@@ -40,26 +37,28 @@ const int NFGameServerPlugin::GetPluginVersion()
 
 const std::string NFGameServerPlugin::GetPluginName()
 {
-    return GET_CLASS_NAME(NFGameServerPlugin)
+	return GET_CLASS_NAME(NFGameServerPlugin);
 }
 
-       void NFGameServerPlugin::Install()
+void NFGameServerPlugin::Install()
 {
 
-    REGISTER_MODULE(pPluginManager, NFCGameServerModule)
-    REGISTER_MODULE(pPluginManager, NFCSceneProcessModule)
+    REGISTER_MODULE(pPluginManager, NFIGameServerModule, NFCGameServerModule)
+    REGISTER_MODULE(pPluginManager, NFISceneProcessModule, NFCSceneProcessModule)
 
-    REGISTER_MODULE(pPluginManager, NFCPropertyModule)
-    REGISTER_MODULE(pPluginManager, NFCLevelModule)
-    REGISTER_MODULE(pPluginManager, NFCPropertyConfigModule)
+    REGISTER_MODULE(pPluginManager, NFIPropertyModule, NFCPropertyModule)
+    REGISTER_MODULE(pPluginManager, NFILevelModule, NFCLevelModule)
+    REGISTER_MODULE(pPluginManager, NFIPropertyConfigModule, NFCPropertyConfigModule)
+    REGISTER_MODULE(pPluginManager, NFINPCRefreshModule, NFCNPCRefreshModule)
 }
 
 void NFGameServerPlugin::Uninstall()
 {
-    UNREGISTER_MODULE(pPluginManager, NFCPropertyConfigModule)
-    UNREGISTER_MODULE(pPluginManager, NFCLevelModule)
-    UNREGISTER_MODULE(pPluginManager, NFCPropertyModule)
+	UNREGISTER_MODULE(pPluginManager, NFINPCRefreshModule, NFCNPCRefreshModule)
+	UNREGISTER_MODULE(pPluginManager, NFIPropertyConfigModule, NFCPropertyConfigModule)
+    UNREGISTER_MODULE(pPluginManager, NFILevelModule, NFCLevelModule)
+    UNREGISTER_MODULE(pPluginManager, NFIPropertyModule, NFCPropertyModule)
 
-    UNREGISTER_MODULE(pPluginManager, NFCSceneProcessModule)
-    UNREGISTER_MODULE(pPluginManager, NFCGameServerModule)
+    UNREGISTER_MODULE(pPluginManager, NFISceneProcessModule, NFCSceneProcessModule)
+    UNREGISTER_MODULE(pPluginManager, NFIGameServerModule, NFCGameServerModule)
 }

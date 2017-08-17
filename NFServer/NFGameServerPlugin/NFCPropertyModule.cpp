@@ -7,10 +7,14 @@
 // -------------------------------------------------------------------------
 
 #include "NFCPropertyModule.h"
-#include "NFComm/NFCore/NFTimer.h"
 
 bool NFCPropertyModule::Init()
 {
+	   m_pKernelModule = pPluginManager->FindModule<NFIKernelModule>();
+    m_pElementModule = pPluginManager->FindModule<NFIElementModule>();
+    m_pClassModule = pPluginManager->FindModule<NFIClassModule>();
+    m_pPropertyConfigModule = pPluginManager->FindModule<NFIPropertyConfigModule>();
+    m_pLevelModule = pPluginManager->FindModule<NFILevelModule>();
 
     return true;
 }
@@ -27,42 +31,30 @@ bool NFCPropertyModule::Execute()
 
 bool NFCPropertyModule::AfterInit()
 {
-    m_pKernelModule = pPluginManager->FindModule<NFIKernelModule>("NFCKernelModule");
-    m_pElementInfoModule = pPluginManager->FindModule<NFIElementInfoModule>("NFCElementInfoModule");
-    m_pLogicClassModule = pPluginManager->FindModule<NFILogicClassModule>("NFCLogicClassModule");
-    m_pPropertyConfigModule = pPluginManager->FindModule<NFIPropertyConfigModule>("NFCPropertyConfigModule");
-    m_pLevelModule = pPluginManager->FindModule<NFILevelModule>("NFCLevelModule");
-
-    assert(NULL != m_pKernelModule);
-    assert(NULL != m_pElementInfoModule);
-    assert(NULL != m_pLogicClassModule);
-    assert(NULL != m_pPropertyConfigModule);
-    assert(NULL != m_pLevelModule);
-
     m_pKernelModule->AddClassCallBack(NFrame::Player::ThisName(), this, &NFCPropertyModule::OnObjectClassEvent);
 
     return true;
 }
 
-int NFCPropertyModule::GetPropertyValue(const NFGUID& self, const std::string& strPropertyName, const NFPropertyGroup eGroupType)
+int64_t NFCPropertyModule::GetPropertyValue(const NFGUID& self, const std::string& strPropertyName, const NFPropertyGroup eGroupType)
 {
     if (NFPropertyGroup::NPG_ALL != eGroupType)
     {
-        return m_pKernelModule->GetRecordInt(self, NFrame::Player::R_CommPropertyValue(), eGroupType, strPropertyName);
+        return m_pKernelModule->GetRecordInt(self, NFrame::Player::CommValue::ThisName(), eGroupType, strPropertyName);
     }
 
     return m_pKernelModule->GetPropertyInt(self, strPropertyName);
 }
 
-int NFCPropertyModule::SetPropertyValue(const NFGUID& self, const std::string& strPropertyName, const NFPropertyGroup eGroupType, const int nValue)
+int NFCPropertyModule::SetPropertyValue(const NFGUID& self, const std::string& strPropertyName, const NFPropertyGroup eGroupType, const int64_t nValue)
 {
     if (NFPropertyGroup::NPG_ALL != eGroupType)
     {
         NF_SHARE_PTR<NFIObject> pObject = m_pKernelModule->GetObject(self);
-        if (pObject.get())
+        if (pObject)
         {
-            NF_SHARE_PTR<NFIRecord> pRecord = m_pKernelModule->FindRecord(self, NFrame::Player::R_CommPropertyValue());
-            if (pRecord.get())
+            NF_SHARE_PTR<NFIRecord> pRecord = m_pKernelModule->FindRecord(self, NFrame::Player::CommValue::ThisName());
+            if (pRecord)
             {
                 pRecord->SetUsed(eGroupType, true);
                 return pRecord->SetInt(eGroupType, strPropertyName, nValue);
@@ -72,56 +64,35 @@ int NFCPropertyModule::SetPropertyValue(const NFGUID& self, const std::string& s
         //return m_pKernelModule->SetRecordInt( self, mstrCommPropertyName, eGroupType, *pTableCol, nValue );
     }
 
-    //动态表中没有，则设置到最终值
+    
     m_pKernelModule->SetPropertyInt(self, strPropertyName, nValue);
 
     return 0;
 }
 
 
-int NFCPropertyModule::AddPropertyValue(const NFGUID& self, const std::string& strPropertyName, const NFPropertyGroup eGroupType, const int nValue)
+bool NFCPropertyModule::AddPropertyValue(const NFGUID& self, const std::string& strPropertyName, const NFPropertyGroup eGroupType, const int64_t nValue)
 {
     if (NFPropertyGroup::NPG_ALL != eGroupType)
     {
         NF_SHARE_PTR<NFIObject> pObject = m_pKernelModule->GetObject(self);
-        if (pObject.get())
+        if (pObject)
         {
-            NF_SHARE_PTR<NFIRecord> pRecord = m_pKernelModule->FindRecord(self, NFrame::Player::R_CommPropertyValue());
-            if (pRecord.get())
+            NF_SHARE_PTR<NFIRecord> pRecord = m_pKernelModule->FindRecord(self, NFrame::Player::CommValue::ThisName());
+            if (pRecord)
             {
                 pRecord->SetUsed(eGroupType, true);
-                int nPropertyValue = pRecord->GetInt(eGroupType, strPropertyName);
+                int nPropertyValue = pRecord->GetInt32(eGroupType, strPropertyName);
 
                 return pRecord->SetInt(eGroupType, strPropertyName, nPropertyValue + nValue);
             }
         }
     }
 
-    return 0;
+    return false;
 }
 
-int NFCPropertyModule::SubPropertyValue(const NFGUID& self, const std::string& strPropertyName, const NFPropertyGroup eGroupType, const int nValue)
-{
-    if (NFPropertyGroup::NPG_ALL != eGroupType)
-    {
-        NF_SHARE_PTR<NFIObject> pObject = m_pKernelModule->GetObject(self);
-        if (pObject.get())
-        {
-            NF_SHARE_PTR<NFIRecord> pRecord = m_pKernelModule->FindRecord(self, NFrame::Player::R_CommPropertyValue());
-            if (pRecord.get())
-            {
-                pRecord->SetUsed(eGroupType, true);
-                int nPropertyValue = pRecord->GetInt(eGroupType, strPropertyName);
-
-                return pRecord->SetInt(eGroupType, strPropertyName, nPropertyValue - nValue);
-            }
-        }
-    }
-
-    return 0;
-}
-
-int NFCPropertyModule::OnObjectLevelEvent(const NFGUID& self, const std::string& strPropertyName, const NFIDataList::TData& oldVar, const NFIDataList::TData& newVar)
+int NFCPropertyModule::OnObjectLevelEvent(const NFGUID& self, const std::string& strPropertyName, const NFData& oldVar, const NFData& newVar)
 {
     RefreshBaseProperty(self);
 
@@ -131,21 +102,21 @@ int NFCPropertyModule::OnObjectLevelEvent(const NFGUID& self, const std::string&
     return 0;
 }
 
-int NFCPropertyModule::OnRecordPropertyEvent(const NFGUID& self, const RECORD_EVENT_DATA& xEventData, const NFIDataList::TData& oldVar, const NFIDataList::TData& newVar)
+int NFCPropertyModule::OnRecordEvent(const NFGUID& self, const RECORD_EVENT_DATA& xEventData, const NFData& oldVar, const NFData& newVar)
 {
-    //计算总值
+    
     const std::string& strRecordName = xEventData.strRecordName;
     const int nOpType = xEventData.nOpType;
     const int nRow = xEventData.nRow;
     const int nCol = xEventData.nCol;
 
     int nAllValue = 0;
-    NF_SHARE_PTR<NFIRecord> pRecord = m_pKernelModule->FindRecord(self, NFrame::Player::R_CommPropertyValue());
+    NF_SHARE_PTR<NFIRecord> pRecord = m_pKernelModule->FindRecord(self, NFrame::Player::CommValue::ThisName());
     for (int i = 0; i < (int)(NFPropertyGroup::NPG_ALL); i++)
     {
         if (i < pRecord->GetRows())
         {
-            int nValue = pRecord->GetInt(i, nCol);
+            int nValue = pRecord->GetInt32(i, nCol);
             nAllValue += nValue;
         }
     }
@@ -155,16 +126,16 @@ int NFCPropertyModule::OnRecordPropertyEvent(const NFGUID& self, const RECORD_EV
     return 0;
 }
 
-int NFCPropertyModule::OnObjectClassEvent(const NFGUID& self, const std::string& strClassName, const CLASS_OBJECT_EVENT eClassEvent, const NFIDataList& var)
+int NFCPropertyModule::OnObjectClassEvent(const NFGUID& self, const std::string& strClassName, const CLASS_OBJECT_EVENT eClassEvent, const NFDataList& var)
 {
     if (strClassName == NFrame::Player::ThisName())
     {
         if (CLASS_OBJECT_EVENT::COE_CREATE_NODATA == eClassEvent)
         {
-            NF_SHARE_PTR<NFIRecord> pRecord = m_pKernelModule->FindRecord(self, NFrame::Player::R_CommPropertyValue());
-            if (pRecord.get())
+            NF_SHARE_PTR<NFIRecord> pRecord = m_pKernelModule->FindRecord(self, NFrame::Player::CommValue::ThisName());
+            if (pRecord)
             {
-                for (int i = 0; i < NPG_ALL; i++)
+                for (int i = 0; i < NFPropertyGroup::NPG_ALL; i++)
                 {
                     pRecord->AddRow(-1);
                 }
@@ -172,23 +143,23 @@ int NFCPropertyModule::OnObjectClassEvent(const NFGUID& self, const std::string&
 
             m_pKernelModule->AddPropertyCallBack(self, NFrame::Player::Level(), this, &NFCPropertyModule::OnObjectLevelEvent);
 
-            // TODO:一级属性回调
-            m_pKernelModule->AddRecordCallBack(self, NFrame::Player::R_CommPropertyValue(), this, &NFCPropertyModule::OnRecordPropertyEvent);
+            
+            m_pKernelModule->AddRecordCallBack(self, NFrame::Player::CommValue::ThisName(), this, &NFCPropertyModule::OnRecordEvent);
 
 
         }
         else if (CLASS_OBJECT_EVENT::COE_CREATE_EFFECTDATA == eClassEvent)
         {
-            int nOnlineCount = m_pKernelModule->GetPropertyInt(self, NFrame::Player::OnlineCount());
-            if (nOnlineCount <= 0 && m_pKernelModule->GetPropertyInt(self, NFrame::Player::SceneID()) > 0)
+            int nOnlineCount = m_pKernelModule->GetPropertyInt32(self, NFrame::Player::OnlineCount());
+            if (nOnlineCount <= 0 && m_pKernelModule->GetPropertyInt32(self, NFrame::Player::SceneID()) > 0)
             {
-                //第一次出生，设置基础属性
+                
                 m_pKernelModule->SetPropertyInt(self, NFrame::Player::Level(), 1);
             }
         }
         else if (CLASS_OBJECT_EVENT::COE_CREATE_FINISH == eClassEvent)
         {
-            int nOnlineCount = m_pKernelModule->GetPropertyInt(self, NFrame::Player::OnlineCount());
+            int nOnlineCount = m_pKernelModule->GetPropertyInt32(self, NFrame::Player::OnlineCount());
             m_pKernelModule->SetPropertyInt(self, NFrame::Player::OnlineCount(), (nOnlineCount + 1));
 
         }
@@ -199,20 +170,20 @@ int NFCPropertyModule::OnObjectClassEvent(const NFGUID& self, const std::string&
 
 int NFCPropertyModule::RefreshBaseProperty(const NFGUID& self)
 {
-    NF_SHARE_PTR<NFIRecord> pRecord = m_pKernelModule->FindRecord(self, NFrame::Player::R_CommPropertyValue());
-    if (!pRecord.get())
+    NF_SHARE_PTR<NFIRecord> pRecord = m_pKernelModule->FindRecord(self, NFrame::Player::CommValue::ThisName());
+    if (!pRecord)
     {
         return 1;
     }
 
-    //初始属性+等级属性(职业决定)
-    NFJobType eJobType = (NFJobType)m_pKernelModule->GetPropertyInt(self, NFrame::Player::Job());
-    int nLevel = m_pKernelModule->GetPropertyInt(self, NFrame::Player::Level());
+    
+    int eJobType = m_pKernelModule->GetPropertyInt32(self, NFrame::Player::Job());
+    int nLevel = m_pKernelModule->GetPropertyInt32(self, NFrame::Player::Level());
 
     for (int i = 0; i < pRecord->GetCols(); ++i)
     {
         const std::string& strColTag = pRecord->GetColTag(i);
-        int nValue = m_pPropertyConfigModule->CalculateBaseValue(eJobType, nLevel, strColTag);
+        int nValue = (int)m_pPropertyConfigModule->CalculateBaseValue(eJobType, nLevel, strColTag);
         SetPropertyValue(self, strColTag, NFPropertyGroup::NPG_JOBLEVEL, nValue);
     }
 
@@ -236,15 +207,15 @@ bool NFCPropertyModule::FullHPMP(const NFGUID& self)
     return true;
 }
 
-bool NFCPropertyModule::AddHP(const NFGUID& self, const NFINT64& nValue)
+bool NFCPropertyModule::AddHP(const NFGUID& self, const int nValue)
 {
     if (nValue <= 0)
     {
         return false;
     }
 
-    NFINT64 nCurValue = m_pKernelModule->GetPropertyInt(self, NFrame::Player::HP());
-    NFINT64 nMaxValue = m_pKernelModule->GetPropertyInt(self, NFrame::Player::MAXHP());
+	int nCurValue = m_pKernelModule->GetPropertyInt32(self, NFrame::Player::HP());
+	int nMaxValue = m_pKernelModule->GetPropertyInt32(self, NFrame::Player::MAXHP());
 
     if (nCurValue > 0)
     {
@@ -260,7 +231,7 @@ bool NFCPropertyModule::AddHP(const NFGUID& self, const NFINT64& nValue)
     return true;
 }
 
-bool NFCPropertyModule::EnoughHP(const NFGUID& self, const NFINT64& nValue)
+bool NFCPropertyModule::EnoughHP(const NFGUID& self, const int nValue)
 {
     NFINT64 nCurValue = m_pKernelModule->GetPropertyInt(self, NFrame::Player::HP());
     if ((nCurValue > 0) && (nCurValue - nValue >= 0))
@@ -271,9 +242,9 @@ bool NFCPropertyModule::EnoughHP(const NFGUID& self, const NFINT64& nValue)
     return false;
 }
 
-bool NFCPropertyModule::ConsumeHP(const NFGUID& self, const NFINT64& nValue)
+bool NFCPropertyModule::ConsumeHP(const NFGUID& self, const int nValue)
 {
-    NFINT64 nCurValue = m_pKernelModule->GetPropertyInt(self, NFrame::Player::HP());
+	int nCurValue = m_pKernelModule->GetPropertyInt32(self, NFrame::Player::HP());
     if ((nCurValue > 0) && (nCurValue - nValue >= 0))
     {
         nCurValue -= nValue;
@@ -285,15 +256,15 @@ bool NFCPropertyModule::ConsumeHP(const NFGUID& self, const NFINT64& nValue)
     return false;
 }
 
-bool NFCPropertyModule::AddMP(const NFGUID& self, const NFINT64& nValue)
+bool NFCPropertyModule::AddMP(const NFGUID& self, const int nValue)
 {
     if (nValue <= 0)
     {
         return false;
     }
 
-    NFINT64 nCurValue = m_pKernelModule->GetPropertyInt(self, NFrame::Player::MP());
-    NFINT64 nMaxValue = m_pKernelModule->GetPropertyInt(self, NFrame::Player::MAXMP());
+	int nCurValue = m_pKernelModule->GetPropertyInt32(self, NFrame::Player::MP());
+	int nMaxValue = m_pKernelModule->GetPropertyInt32(self, NFrame::Player::MAXMP());
 
     nCurValue += nValue;
     if (nCurValue > nMaxValue)
@@ -306,9 +277,9 @@ bool NFCPropertyModule::AddMP(const NFGUID& self, const NFINT64& nValue)
     return true;
 }
 
-bool NFCPropertyModule::ConsumeMP(const NFGUID& self, const NFINT64& nValue)
+bool NFCPropertyModule::ConsumeMP(const NFGUID& self, const int nValue)
 {
-    NFINT64 nCurValue = m_pKernelModule->GetPropertyInt(self, NFrame::Player::MP());
+	int nCurValue = m_pKernelModule->GetPropertyInt32(self, NFrame::Player::MP());
     if ((nCurValue > 0) && (nCurValue - nValue >= 0))
     {
         nCurValue -= nValue;
@@ -320,9 +291,9 @@ bool NFCPropertyModule::ConsumeMP(const NFGUID& self, const NFINT64& nValue)
     return false;
 }
 
-bool NFCPropertyModule::EnoughMP(const NFGUID& self, const NFINT64& nValue)
+bool NFCPropertyModule::EnoughMP(const NFGUID& self, const int nValue)
 {
-    NFINT64 nCurValue = m_pKernelModule->GetPropertyInt(self, NFrame::Player::MP());
+	int nCurValue = m_pKernelModule->GetPropertyInt32(self, NFrame::Player::MP());
     if ((nCurValue > 0) && (nCurValue - nValue >= 0))
     {
         return true;
@@ -333,7 +304,7 @@ bool NFCPropertyModule::EnoughMP(const NFGUID& self, const NFINT64& nValue)
 
 bool NFCPropertyModule::FullSP(const NFGUID& self)
 {
-    NFINT64 nMAXCSP = m_pKernelModule->GetPropertyInt(self, NFrame::Player::MAXSP());
+	int nMAXCSP = m_pKernelModule->GetPropertyInt32(self, NFrame::Player::MAXSP());
     if (nMAXCSP > 0)
     {
         m_pKernelModule->SetPropertyInt(self, NFrame::Player::SP(), nMAXCSP);
@@ -344,15 +315,15 @@ bool NFCPropertyModule::FullSP(const NFGUID& self)
     return false;
 }
 
-bool NFCPropertyModule::AddSP(const NFGUID& self, const NFINT64& nValue)
+bool NFCPropertyModule::AddSP(const NFGUID& self, const int nValue)
 {
     if (nValue <= 0)
     {
         return false;
     }
 
-    NFINT64 nCurValue = m_pKernelModule->GetPropertyInt(self, NFrame::Player::SP());
-    NFINT64 nMaxValue = m_pKernelModule->GetPropertyInt(self, NFrame::Player::MAXSP());
+	int nCurValue = m_pKernelModule->GetPropertyInt32(self, NFrame::Player::SP());
+	int nMaxValue = m_pKernelModule->GetPropertyInt32(self, NFrame::Player::MAXSP());
 
     nCurValue += nValue;
     if (nCurValue > nMaxValue)
@@ -365,9 +336,9 @@ bool NFCPropertyModule::AddSP(const NFGUID& self, const NFINT64& nValue)
     return true;
 }
 
-bool NFCPropertyModule::ConsumeSP(const NFGUID& self, const NFINT64& nValue)
+bool NFCPropertyModule::ConsumeSP(const NFGUID& self, const int nValue)
 {
-    NFINT64 nCSP = m_pKernelModule->GetPropertyInt(self, NFrame::Player::SP());
+	int nCSP = m_pKernelModule->GetPropertyInt32(self, NFrame::Player::SP());
     if ((nCSP > 0) && (nCSP - nValue >= 0))
     {
         nCSP -= nValue;
@@ -379,9 +350,9 @@ bool NFCPropertyModule::ConsumeSP(const NFGUID& self, const NFINT64& nValue)
     return false;
 }
 
-bool NFCPropertyModule::EnoughSP(const NFGUID& self, const NFINT64& nValue)
+bool NFCPropertyModule::EnoughSP(const NFGUID& self, const int nValue)
 {
-    NFINT64 nCurValue = m_pKernelModule->GetPropertyInt(self, NFrame::Player::SP());
+	int nCurValue = m_pKernelModule->GetPropertyInt32(self, NFrame::Player::SP());
     if ((nCurValue > 0) && (nCurValue - nValue >= 0))
     {
         return true;
@@ -390,28 +361,28 @@ bool NFCPropertyModule::EnoughSP(const NFGUID& self, const NFINT64& nValue)
     return false;
 }
 
-bool NFCPropertyModule::AddMoney(const NFGUID& self, const NFINT64& nValue)
+bool NFCPropertyModule::AddGold(const NFGUID& self, const int64_t nValue)
 {
     if (nValue <= 0)
     {
         return false;
     }
 
-    NFINT64 nCurValue = m_pKernelModule->GetPropertyInt(self, NFrame::Player::Gold());
+	int64_t nCurValue = m_pKernelModule->GetPropertyInt(self, NFrame::Player::Gold());
     nCurValue += nValue;
     m_pKernelModule->SetPropertyInt(self, NFrame::Player::Gold(), nCurValue);
 
     return false;
 }
 
-bool NFCPropertyModule::ConsumeMoney(const NFGUID& self, const NFINT64& nValue)
+bool NFCPropertyModule::ConsumeGold(const NFGUID& self, const int64_t nValue)
 {
     if (nValue <= 0)
     {
         return false;
     }
 
-    NFINT64 nCurValue = m_pKernelModule->GetPropertyInt(self, NFrame::Player::Gold());
+	int64_t nCurValue = m_pKernelModule->GetPropertyInt(self, NFrame::Player::Gold());
     nCurValue -= nValue;
     if (nCurValue >= 0)
     {
@@ -423,9 +394,9 @@ bool NFCPropertyModule::ConsumeMoney(const NFGUID& self, const NFINT64& nValue)
     return false;
 }
 
-bool NFCPropertyModule::EnoughMoney(const NFGUID& self, const NFINT64& nValue)
+bool NFCPropertyModule::EnoughGold(const NFGUID& self, const int64_t nValue)
 {
-    NFINT64 nCurValue = m_pKernelModule->GetPropertyInt(self, NFrame::Player::Gold());
+	int64_t nCurValue = m_pKernelModule->GetPropertyInt(self, NFrame::Player::Gold());
     if ((nCurValue > 0) && (nCurValue - nValue >= 0))
     {
         return true;
@@ -434,32 +405,32 @@ bool NFCPropertyModule::EnoughMoney(const NFGUID& self, const NFINT64& nValue)
     return false;
 }
 
-bool NFCPropertyModule::AddDiamond(const NFGUID& self, const NFINT64& nValue)
+bool NFCPropertyModule::AddDiamond(const NFGUID& self, const int nValue)
 {
     if (nValue <= 0)
     {
         return false;
     }
 
-    NFINT64 nCurValue = m_pKernelModule->GetPropertyInt(self, NFrame::Player::Money());
+	int nCurValue = m_pKernelModule->GetPropertyInt32(self, NFrame::Player::Diamond());
     nCurValue += nValue;
-    m_pKernelModule->SetPropertyInt(self, NFrame::Player::Money(), nCurValue);
+    m_pKernelModule->SetPropertyInt(self, NFrame::Player::Diamond(), nCurValue);
 
     return false;
 }
 
-bool NFCPropertyModule::ConsumeDiamond(const NFGUID& self, const NFINT64& nValue)
+bool NFCPropertyModule::ConsumeDiamond(const NFGUID& self, const int nValue)
 {
     if (nValue <= 0)
     {
         return false;
     }
 
-    NFINT64 nCurValue = m_pKernelModule->GetPropertyInt(self, NFrame::Player::Money());
+	int nCurValue = m_pKernelModule->GetPropertyInt32(self, NFrame::Player::Diamond());
     nCurValue -= nValue;
     if (nCurValue >= 0)
     {
-        m_pKernelModule->SetPropertyInt(self, NFrame::Player::Money(), nCurValue);
+        m_pKernelModule->SetPropertyInt(self, NFrame::Player::Diamond(), nCurValue);
 
         return true;
     }
@@ -467,9 +438,9 @@ bool NFCPropertyModule::ConsumeDiamond(const NFGUID& self, const NFINT64& nValue
     return false;
 }
 
-bool NFCPropertyModule::EnoughDiamond(const NFGUID& self, const NFINT64& nValue)
+bool NFCPropertyModule::EnoughDiamond(const NFGUID& self, const int nValue)
 {
-    NFINT64 nCurValue = m_pKernelModule->GetPropertyInt(self, NFrame::Player::Money());
+	int nCurValue = m_pKernelModule->GetPropertyInt32(self, NFrame::Player::Diamond());
     if ((nCurValue > 0) && (nCurValue - nValue >= 0))
     {
         return true;

@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//    @FileName      :    NFIActor.h
+//    @FileName			:    NFIActor.h
 //    @Author           :    LvSheng.Huang
 //    @Date             :    2012-12-15
 //    @Module           :    NFIActor
@@ -13,108 +13,93 @@
 
 #include <map>
 #include <string>
-
 #include <Theron/Theron.h>
+#include "NFIModule.h"
 
-#include "NFILogicModule.h"
-#include "NFIActorManager.h"
-#include "NFComm/NFCore/NFIComponent.h"
+class NFIComponent;
+class NFIActorModule;
+
+typedef std::function<int(const NFGUID&, const int, const int, std::string&)> ACTOR_PROCESS_FUNCTOR;
+typedef NF_SHARE_PTR<ACTOR_PROCESS_FUNCTOR> ACTOR_PROCESS_FUNCTOR_PTR;
+
 
 class NFIActorMessage
 {
 public:
-    NFIActorMessage()
-    {
-        eType = EACTOR_UNKNOW;
-        nSubMsgID = 0;
-        nFormActor = 0;
-    }
+	enum MessageType
+	{
+		ACTOR_MSG_TYPE_COMPONENT,
+		ACTOR_MSG_TYPE_END_FUNC,
+		ACTOR_MSG_TYPE_NET_MSG,
+	};
 
-    enum EACTOR_MESSAGE_ID
-    {
-        EACTOR_UNKNOW,
-        EACTOR_INIT,
-        EACTOR_AFTER_INIT,
-        EACTOR_CHECKCONFIG,
-        EACTOR_EXCUTE,
-        EACTOR_BEFORE_SHUT,
-        EACTOR_SHUT,
-        EACTOR_NET_MSG,
-        EACTOR_TRANS_MSG,
-        EACTOR_LOG_MSG,
-        EACTOR_EVENT_MSG,
-        EACTOR_RETURN_EVENT_MSG,
+	NFIActorMessage()
+	{
+		nMsgID = 0;
+		nFormActor = 0;
+		msgType = ACTOR_MSG_TYPE_COMPONENT;
+	}
 
-        EACTOR_GET_PROPERTY_MSG_INT = 100,
-        EACTOR_GET_PROPERTY_MSG_FLOAT,
-        EACTOR_GET_PROPERTY_MSG_DOUBLE,
-        EACTOR_GET_PROPERTY_MSG_STRING,
-        EACTOR_GET_PROPERTY_MSG_OBJECT,
-
-        EACTOR_SET_PROPERTY_MSG_INT = 110,
-        EACTOR_SET_PROPERTY_MSG_FLOAT,
-        EACTOR_SET_PROPERTY_MSG_DOUBLE,
-        EACTOR_SET_PROPERTY_MSG_STRING,
-        EACTOR_SET_PROPERTY_MSG_OBJECT,
-
-        EACTOR_GET_RECORD_MSG_INT = 120,
-        EACTOR_GET_RECORD_MSG_FLOAT,
-        EACTOR_GET_RECORD_MSG_DOUBLE,
-        EACTOR_GET_RECORD_MSG_STRING,
-        EACTOR_GET_RECORD_MSG_OBJECT,
-
-        EACTOR_SET_RECORD_MSG_INT = 130,
-        EACTOR_SET_RECORD_MSG_FLOAT,
-        EACTOR_SET_RECORD_MSG_DOUBLE,
-        EACTOR_SET_RECORD_MSG_STRING,
-        EACTOR_SET_RECORD_MSG_OBJECT,
-    };
-
-    EACTOR_MESSAGE_ID eType;
-    int nSubMsgID;
-    int nFormActor;
-    std::string data;
-    ////////////////////event/////////////////////////////////////////////////
-    NFGUID self;
-    //////////////////////////////////////////////////////////////////////////
-    EVENT_ASYNC_PROCESS_END_FUNCTOR_PTR xEndFuncptr;
+	int nMsgID;
+	int nFormActor;
+	std::string data;
+	MessageType msgType;
+	////////////////////event/////////////////////////////////////////////////
+	NFGUID self;
+	//////////////////////////////////////////////////////////////////////////
+	ACTOR_PROCESS_FUNCTOR_PTR xEndFuncptr;
 protected:
 private:
 };
 
-class NFIActor : public Theron::Actor, public NFILogicModule
+class NFIActor : public Theron::Actor
 {
 public:
-    NFIActor(Theron::Framework& framework, NFIActorManager* pManager) : Theron::Actor(framework)
+    NFIActor(Theron::Framework& framework) : Theron::Actor(framework)
     {
-        m_pActorManager = pManager;
-
-        RegisterHandler(this, &NFIActor::Handler);
+        RegisterHandler(this, &NFIActor::DefaultHandler);
     }
 
-    NFIActorManager* GetActorManager()
-    {
-        return m_pActorManager;
-    }
+	virtual ~NFIActor() {}
 
-    virtual void AddComponent(NF_SHARE_PTR<NFIComponent> pComponent) = 0;
-    virtual bool AddEndFunc(EVENT_ASYNC_PROCESS_END_FUNCTOR_PTR functorPtr_end) = 0;
-    virtual bool SendMsg(const Theron::Address address, const NFIActorMessage& message) = 0;
+	virtual void AddComponent(NF_SHARE_PTR<NFIComponent> pComponent) = 0;
+
+	template<typename T>
+	NF_SHARE_PTR<T> FindComponent(const std::string& strName)
+	{
+		if (!TIsDerived<T, NFIComponent>::Result)
+		{
+			//BaseTypeComponent must inherit from NFIComponent;
+			return NF_SHARE_PTR<T>();
+		}
+
+		NF_SHARE_PTR<NFIComponent> pComponent = FindComponent(strName);
+		NF_SHARE_PTR<T> pT = std::dynamic_pointer_cast<T>(pComponent);
+		if (nullptr != pT)
+		{
+			return pT;
+		}
+
+		return NF_SHARE_PTR<T>();
+	}
+	virtual NF_SHARE_PTR<NFIComponent> FindComponent(const std::string& strComponentName) = 0;
+	
+	virtual bool AddBeginunc(const int nSubMsgID, ACTOR_PROCESS_FUNCTOR_PTR xBeginFunctor) = 0;
+	virtual bool AddEndFunc(const int nSubMsgID, ACTOR_PROCESS_FUNCTOR_PTR xEndFunctor) = 0;
+    
+	virtual bool SendMsg(const Theron::Address address, const NFIActorMessage& message) = 0;
 
 protected:
 
     virtual void HandlerEx(const NFIActorMessage& message, const Theron::Address from) {};
-    virtual void HandlerSelf(const NFIActorMessage& message, const Theron::Address from) {};
+    virtual void Handler(const NFIActorMessage& message, const Theron::Address from) {};
 
 private:
-    void Handler(const NFIActorMessage& message, const Theron::Address from)
+    void DefaultHandler(const NFIActorMessage& message, const Theron::Address from)
     {
-
-        //收到消息要处理逻辑
-        if (message.eType == NFIActorMessage::EACTOR_EVENT_MSG)
+        if (message.msgType == NFIActorMessage::ACTOR_MSG_TYPE_COMPONENT)
         {
-            HandlerSelf(message, from);
-
+			Handler(message, from);
         }
         else
         {
@@ -123,8 +108,8 @@ private:
     }
 
 protected:
-    NFIActorManager* m_pActorManager;
+	NFIActorModule* m_pActorModule;
 
 };
 
-#endif // !NFI_ACTOR_H
+#endif

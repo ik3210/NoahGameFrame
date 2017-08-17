@@ -1,25 +1,58 @@
 // -------------------------------------------------------------------------
-//    @FileName         £º    NFIGameServerNet_ServerModule.h
-//    @Author           £º    LvSheng.Huang
-//    @Date             £º    2012-12-15
-//    @Module           £º    NFIGameServerNet_ServerModule
+
+
+
+
 //
 // -------------------------------------------------------------------------
 
-#ifndef _NFI_GAMESERVERNET_SERVERMODULE_H
-#define _NFI_GAMESERVERNET_SERVERMODULE_H
+#ifndef NFI_GAMESERVERNET_SERVERMODULE_H
+#define NFI_GAMESERVERNET_SERVERMODULE_H
 
 #include <iostream>
-#include "NFILogicModule.h"
+#include "NFIModule.h"
 #include "NFINetModule.h"
 
 class NFIGameServerNet_ServerModule
-    : public NFINetModule
+    : public NFIModule
 {
+public:
+
+    struct GateBaseInfo
+    {
+        GateBaseInfo()
+        {
+            nActorID = 0;
+            nGateID = 0;
+        }
+
+        GateBaseInfo(const int gateID, const NFGUID xIdent)
+        {
+            nActorID = 0;
+            nGateID = gateID;
+            xClientID = xIdent;
+        }
+
+        int nActorID;
+        int nGateID;
+        NFGUID xClientID;
+    };
+
+    struct GateServerInfo
+    {
+        ServerData xServerData;
+
+        std::map<NFGUID, NFSOCK> xRoleInfo;
+    };
 
 public:
-    virtual void SendMsgPBToGate(const uint16_t nMsgID, google::protobuf::Message& xMsg, const NFGUID& self) = 0;
-    virtual void SendMsgPBToGate(const uint16_t nMsgID, const std::string& strMsg, const NFGUID& self) = 0;
+	virtual void SendMsgPBToGate(const uint16_t nMsgID, google::protobuf::Message& xMsg, const NFGUID& self) = 0;
+	virtual void SendMsgPBToGate(const uint16_t nMsgID, const std::string& strMsg, const NFGUID& self) = 0;
+    virtual bool AddPlayerGateInfo(const NFGUID& nRoleID, const NFGUID& nClientID, const int nGateID) = 0;
+    virtual bool RemovePlayerGateInfo(const NFGUID& nRoleID) = 0;
+    virtual NF_SHARE_PTR<GateBaseInfo> GetPlayerGateInfo(const NFGUID& nRoleID) = 0;   
+	virtual NF_SHARE_PTR<GateServerInfo> GetGateServerInfo(const int nGateID) = 0;
+	virtual NF_SHARE_PTR<GateServerInfo> GetGateServerInfoBySockIndex(const NFSOCK nSockIndex) = 0;
 };
 
 #endif

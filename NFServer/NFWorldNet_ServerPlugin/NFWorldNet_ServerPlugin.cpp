@@ -29,15 +29,15 @@ const int NFWorldNet_ServerPlugin::GetPluginVersion()
 
 const std::string NFWorldNet_ServerPlugin::GetPluginName()
 {
-    return GET_CLASS_NAME(NFWorldNet_ServerPlugin)
+	return GET_CLASS_NAME(NFWorldNet_ServerPlugin);
 }
 
-       void NFWorldNet_ServerPlugin::Install()
+void NFWorldNet_ServerPlugin::Install()
 {
-    REGISTER_MODULE(pPluginManager, NFCWorldNet_ServerModule)
+    REGISTER_MODULE(pPluginManager, NFIWorldNet_ServerModule, NFCWorldNet_ServerModule)
 }
 
 void NFWorldNet_ServerPlugin::Uninstall()
 {
-    UNREGISTER_MODULE(pPluginManager, NFCWorldNet_ServerModule)
+    UNREGISTER_MODULE(pPluginManager, NFIWorldNet_ServerModule, NFCWorldNet_ServerModule)
 }

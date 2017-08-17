@@ -1,19 +1,19 @@
 // -------------------------------------------------------------------------
-//    @FileName         £º    NFIGameServerConfigModule.h
-//    @Author           £º    LvSheng.Huang
-//    @Date             £º    2013-04-16
-//    @Module           £º    NFIGameServerConfigModule
+
+
+
+
 //
 // -------------------------------------------------------------------------
 
-#ifndef _NFI_GAMESERVER_CONFIG_MODULE_H
-#define _NFI_GAMESERVER_CONFIG_MODULE_H
+#ifndef NFI_GAMESERVER_CONFIG_MODULE_H
+#define NFI_GAMESERVER_CONFIG_MODULE_H
 
 #include <iostream>
-#include "NFILogicModule.h"
+#include "NFIModule.h"
 
 class NFIGameServerConfigModule
-    : public NFILogicModule
+    : public NFIModule
 {
 public:
     virtual bool AddSceneToActor(const int nSceneID, const int nGameServer) = 0;

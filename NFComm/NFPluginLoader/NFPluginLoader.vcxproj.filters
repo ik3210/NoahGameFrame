@@ -17,10 +17,10 @@
     <ClInclude Include="NFCPluginManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NFCActorManager.h">
+    <ClInclude Include="NFCCell.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="NFCActor.h">
+    <ClInclude Include="NFCCellManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -32,10 +32,10 @@
     <ClCompile Include="NFCPluginManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NFCActorManager.cpp">
+    <ClCompile Include="NFCCell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="NFCActor.cpp">
+    <ClCompile Include="NFCCellManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

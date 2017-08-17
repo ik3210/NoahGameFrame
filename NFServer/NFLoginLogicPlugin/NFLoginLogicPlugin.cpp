@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//    @FileName      :    NFLoginLogicPlugin.cpp
+//    @FileName			:    NFLoginLogicPlugin.cpp
 //    @Author           :    LvSheng.Huang
 //    @Date             :    2012-07-14 08:51
 //    @Module           :    LoginLogicPluginModule
@@ -15,11 +15,7 @@
 
 NF_EXPORT void DllStartPlugin(NFIPluginManager* pm)
 {
-#if NF_PLATFORM == NF_PLATFORM_WIN
-    SetConsoleTitle("NFLoginServer");
-#endif
     CREATE_PLUGIN(pm, NFLoginLogicPlugin)
-
 };
 
 NF_EXPORT void DllStopPlugin(NFIPluginManager* pm)
@@ -43,11 +39,11 @@ const std::string NFLoginLogicPlugin::GetPluginName()
 void NFLoginLogicPlugin::Install()
 {
 
-    REGISTER_MODULE(pPluginManager, NFCLoginLogicModule)
+    REGISTER_MODULE(pPluginManager, NFILoginLogicModule, NFCLoginLogicModule)
 
 }
 
 void NFLoginLogicPlugin::Uninstall()
 {
-    UNREGISTER_MODULE(pPluginManager, NFCLoginLogicModule)
+    UNREGISTER_MODULE(pPluginManager, NFILoginLogicModule, NFCLoginLogicModule)
 }

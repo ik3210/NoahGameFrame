@@ -1,26 +1,24 @@
 // -------------------------------------------------------------------------
-//    @FileName      :   NFIItemConsumeManagerModule.h
+//    @FileName      	:   NFIItemConsumeManagerModule.h
 //    @Author           :   LvSheng.Huang
-//    @Date             :   2013-09-28
+//    @Date             :   2017-02-16
 //    @Module           :   NFIItemConsumeManagerModule
-//    @Desc             :   道具消费机制管理类,所有类型的道具消费类型均需注册才能消费
+
 // -------------------------------------------------------------------------
 
-#ifndef _NFI_ITEMCONSUME_MANAGER_MODULE_H
-#define _NFI_ITEMCONSUME_MANAGER_MODULE_H
+#ifndef NFI_ITEM_CONSUME_MANAGER_MODULE_H
+#define NFI_ITEM_CONSUME_MANAGER_MODULE_H
 
 #include <iostream>
-#include "NFILogicModule.h"
+#include "NFIModule.h"
 #include "NFIItemConsumeProcessModule.h"
 
 class NFIItemConsumeManagerModule
-    : public NFILogicModule
+    : public NFIModule
 {
-
 public:
-    virtual bool ResgisterConsumeModule(const int nModuleType, NFIItemConsumeProcessModule* pModule) = 0;
-
-    virtual NFIItemConsumeProcessModule* GetConsumeModule(const int nModuleType) = 0;
+    virtual bool ResgisterConsumeModule(const int nModuleType, NF_SHARE_PTR<NFIItemConsumeProcessModule> pModule) = 0;
+	virtual NF_SHARE_PTR<NFIItemConsumeProcessModule> GetConsumeModule(const int nModuleType) = 0;
 
 };
 

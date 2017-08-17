@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//    @FileName      :    NFMasterServerPlugin.cpp
+//    @FileName			:    NFMasterServerPlugin.cpp
 //    @Author           :    LvSheng.Huang
 //    @Date             :    2012-07-14 08:51
 //    @Module           :    CentreLogicModule
@@ -16,13 +16,7 @@
 
 NF_EXPORT void DllStartPlugin(NFIPluginManager* pm)
 {
-#if NF_PLATFORM == NF_PLATFORM_WIN
-    SetConsoleTitle("NFMasterServer");
-#endif
-
     CREATE_PLUGIN(pm, NFMasterServerPlugin)
-
-    //std::cout << "DllStartPlugin::thread id=" << GetCurrentThreadId() << std::endl;
 };
 
 NF_EXPORT void DllStopPlugin(NFIPluginManager* pm)
@@ -40,17 +34,17 @@ const int NFMasterServerPlugin::GetPluginVersion()
 
 const std::string NFMasterServerPlugin::GetPluginName()
 {
-    return GET_CLASS_NAME(NFMasterServerPlugin)
+	return GET_CLASS_NAME(NFMasterServerPlugin);
 }
 
-       void NFMasterServerPlugin::Install()
+void NFMasterServerPlugin::Install()
 {
-    REGISTER_MODULE(pPluginManager, NFCMasterModule)
+    REGISTER_MODULE(pPluginManager, NFIMasterModule, NFCMasterModule)
 
 
 }
 
 void NFMasterServerPlugin::Uninstall()
 {
-    UNREGISTER_MODULE(pPluginManager, NFCMasterModule)
+    UNREGISTER_MODULE(pPluginManager, NFIMasterModule, NFCMasterModule)
 }

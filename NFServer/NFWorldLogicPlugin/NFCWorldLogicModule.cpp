@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//    @FileName      :    NFCWorldLogicModule.cpp
+//    @FileName			:    NFCWorldLogicModule.cpp
 //    @Author           :    LvSheng.Huang
 //    @Date             :    2013-01-02
 //    @Module           :    NFCWorldLogicModule
@@ -8,7 +8,6 @@
 
 #include "NFWorldLogicPlugin.h"
 #include "NFCWorldLogicModule.h"
-#include "NFComm/Config/NFConfig.h"
 #include "NFComm/NFPluginModule/NFPlatform.h"
 
 bool NFCWorldLogicModule::Init()
@@ -32,9 +31,7 @@ bool NFCWorldLogicModule::Execute()
 
 bool NFCWorldLogicModule::AfterInit()
 {
-    m_pKernelModule = pPluginManager->FindModule<NFIKernelModule>("NFCKernelModule");
-
-    assert(NULL != m_pKernelModule);
+    m_pKernelModule = pPluginManager->FindModule<NFIKernelModule>();
 
     return true;
 }

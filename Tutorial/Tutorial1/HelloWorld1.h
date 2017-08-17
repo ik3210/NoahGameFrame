@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//    @FileName      :    HelloWorld1.h
+//    @FileName			:    HelloWorld1.h
 //    @Author           :    LvSheng.Huang
 //    @Date             :    2014-05-14 08:51
 //    @Module           :   HelloWorld1
@@ -12,11 +12,16 @@
 #include "NFComm/NFPluginModule/NFIPlugin.h"
 #include "NFComm/NFPluginModule/NFIPluginManager.h"
 
-class HelloWorld1
-    : public NFILogicModule
+class NFIHelloWorld1
+	: public NFIModule
+{
+};
+
+class NFCHelloWorld1
+    : public NFIHelloWorld1
 {
 public:
-    HelloWorld1(NFIPluginManager* p)
+    NFCHelloWorld1(NFIPluginManager* p)
     {
         pPluginManager = p;
     }

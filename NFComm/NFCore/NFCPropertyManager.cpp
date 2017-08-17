@@ -17,7 +17,7 @@ NFCPropertyManager::~NFCPropertyManager()
 bool NFCPropertyManager::RegisterCallback(const std::string& strProperty, const PROPERTY_EVENT_FUNCTOR_PTR& cb)
 {
     NF_SHARE_PTR<NFIProperty> pProperty = this->GetElement(strProperty);
-    if (pProperty.get())
+    if (pProperty)
     {
         pProperty->RegisterCallback(cb);
         return true;
@@ -30,41 +30,40 @@ NF_SHARE_PTR<NFIProperty> NFCPropertyManager::AddProperty(const NFGUID& self, NF
 {
     const std::string& strProperty = pProperty->GetKey();
     NF_SHARE_PTR<NFIProperty> pOldProperty = this->GetElement(strProperty);
-    if (!pOldProperty.get())
+    if (!pOldProperty)
     {
-        NF_SHARE_PTR<NFIProperty> pNewProperty(NF_NEW NFCProperty(self, strProperty, pProperty->GetType(), pProperty->GetPublic(), pProperty->GetPrivate(), pProperty->GetSave(), pProperty->GetView(), pProperty->GetIndex(), pProperty->GetRelationValue()));
-        this->AddElement(strProperty, pNewProperty);
+        NF_SHARE_PTR<NFIProperty> pNewProperty(NF_NEW NFCProperty(self, strProperty, pProperty->GetType()));
 
-        if (pProperty->GetIndex() > 0)
-        {
-            mxPropertyIndexMap.insert(std::map<std::string, int>::value_type(strProperty, pProperty->GetIndex()));
-        }
+        pNewProperty->SetPublic(pProperty->GetPublic());
+        pNewProperty->SetPrivate(pProperty->GetPrivate());
+        pNewProperty->SetSave(pProperty->GetSave());
+        pNewProperty->SetCache(pProperty->GetCache());
+        pNewProperty->SetRef(pProperty->GetRef());
+		pNewProperty->SetUpload(pProperty->GetUpload());
+
+        this->AddElement(strProperty, pNewProperty);
     }
 
     return pOldProperty;
 }
 
-NF_SHARE_PTR<NFIProperty> NFCPropertyManager::AddProperty(const NFGUID& self, const std::string& strPropertyName, const TDATA_TYPE varType, bool bPublic,  bool bPrivate,  bool bSave, bool bView, int nIndex, const std::string& strScriptFunction)
+NF_SHARE_PTR<NFIProperty> NFCPropertyManager::AddProperty(const NFGUID& self, const std::string& strPropertyName, const NFDATA_TYPE varType)
 {
     NF_SHARE_PTR<NFIProperty> pProperty = this->GetElement(strPropertyName);
-    if (!pProperty.get())
+    if (!pProperty)
     {
-        pProperty = NF_SHARE_PTR<NFIProperty>(NF_NEW NFCProperty(self, strPropertyName, varType, bPublic, bPrivate, bSave, bView, nIndex, strScriptFunction));
-        this->AddElement(strPropertyName, pProperty);
+        pProperty = NF_SHARE_PTR<NFIProperty>(NF_NEW NFCProperty(self, strPropertyName, varType));
 
-        if (pProperty->GetIndex() > 0)
-        {
-            mxPropertyIndexMap.insert(std::map<std::string, int>::value_type(strPropertyName, nIndex));
-        }
+        this->AddElement(strPropertyName, pProperty);
     }
 
     return pProperty;
 }
 
-bool NFCPropertyManager::SetProperty(const std::string& strPropertyName, const NFIDataList::TData& TData)
+bool NFCPropertyManager::SetProperty(const std::string& strPropertyName, const NFData& TData)
 {
     NF_SHARE_PTR<NFIProperty> pProperty = GetElement(strPropertyName);
-    if (pProperty.get())
+    if (pProperty)
     {
         pProperty->SetValue(TData);
 
@@ -74,44 +73,15 @@ bool NFCPropertyManager::SetProperty(const std::string& strPropertyName, const N
     return false;
 }
 
-// bool NFCPropertyManager::SetProperty(const NFIProperty* pProperty)
-// {
-//     NF_SHARE_PTR<NFIProperty> pSelfProperty = GetElement(pProperty->GetKey());
-//     if (pSelfProperty.get())
-//     {
-//         pSelfProperty->SetValue(pProperty);
-//
-//         return true;
-//     }
-//
-//     return false;
-// }
-
 const NFGUID& NFCPropertyManager::Self()
 {
     return mSelf;
 }
 
-const std::map<std::string, int>& NFCPropertyManager::GetPropertyIndex()
-{
-    return mxPropertyIndexMap;
-}
-
-const int NFCPropertyManager::GetPropertyIndex(const std::string& strProperty)
-{
-    std::map<std::string, int>::iterator it = mxPropertyIndexMap.find(strProperty);
-    if (it != mxPropertyIndexMap.end())
-    {
-        return it->second;
-    }
-
-    return 0;
-}
-
 bool NFCPropertyManager::SetPropertyInt(const std::string& strPropertyName, const NFINT64 nValue)
 {
     NF_SHARE_PTR<NFIProperty> pProperty = GetElement(strPropertyName);
-    if (pProperty.get())
+    if (pProperty)
     {
         return pProperty->SetInt(nValue);
     }
@@ -122,7 +92,7 @@ bool NFCPropertyManager::SetPropertyInt(const std::string& strPropertyName, cons
 bool NFCPropertyManager::SetPropertyFloat(const std::string& strPropertyName, const double dwValue)
 {
     NF_SHARE_PTR<NFIProperty> pProperty = GetElement(strPropertyName);
-    if (pProperty.get())
+    if (pProperty)
     {
         return pProperty->SetFloat(dwValue);
     }
@@ -133,7 +103,7 @@ bool NFCPropertyManager::SetPropertyFloat(const std::string& strPropertyName, co
 bool NFCPropertyManager::SetPropertyString(const std::string& strPropertyName, const std::string& strValue)
 {
     NF_SHARE_PTR<NFIProperty> pProperty = GetElement(strPropertyName);
-    if (pProperty.get())
+    if (pProperty)
     {
         return pProperty->SetString(strValue);
     }
@@ -144,7 +114,7 @@ bool NFCPropertyManager::SetPropertyString(const std::string& strPropertyName, c
 bool NFCPropertyManager::SetPropertyObject(const std::string& strPropertyName, const NFGUID& obj)
 {
     NF_SHARE_PTR<NFIProperty> pProperty = GetElement(strPropertyName);
-    if (pProperty.get())
+    if (pProperty)
     {
         return pProperty->SetObject(obj);
     }
@@ -152,32 +122,50 @@ bool NFCPropertyManager::SetPropertyObject(const std::string& strPropertyName, c
     return false;
 }
 
+bool NFCPropertyManager::SetPropertyVector2(const std::string& strPropertyName, const NFVector2& value)
+{
+	NF_SHARE_PTR<NFIProperty> pProperty = GetElement(strPropertyName);
+	if (pProperty)
+	{
+		return pProperty->SetVector2(value);
+	}
+
+	return false;
+}
+
+bool NFCPropertyManager::SetPropertyVector3(const std::string& strPropertyName, const NFVector3& value)
+{
+	NF_SHARE_PTR<NFIProperty> pProperty = GetElement(strPropertyName);
+	if (pProperty)
+	{
+		return pProperty->SetVector3(value);
+	}
+
+	return false;
+}
+
 NFINT64 NFCPropertyManager::GetPropertyInt(const std::string& strPropertyName)
 {
     NF_SHARE_PTR<NFIProperty> pProperty = GetElement(strPropertyName);
-    if (pProperty.get())
-    {
-        return pProperty->GetInt();
-    }
+	return pProperty ? pProperty->GetInt() : 0;
+}
 
-    return 0;
+int NFCPropertyManager::GetPropertyInt32(const std::string& strPropertyName)
+{
+	NF_SHARE_PTR<NFIProperty> pProperty = GetElement(strPropertyName);
+	return pProperty ? pProperty->GetInt32() : 0;
 }
 
 double NFCPropertyManager::GetPropertyFloat(const std::string& strPropertyName)
 {
     NF_SHARE_PTR<NFIProperty> pProperty = GetElement(strPropertyName);
-    if (pProperty.get())
-    {
-        return pProperty->GetFloat();
-    }
-
-    return 0.0;
+	return pProperty ? pProperty->GetFloat() : 0.0;
 }
 
 const std::string& NFCPropertyManager::GetPropertyString(const std::string& strPropertyName)
 {
     NF_SHARE_PTR<NFIProperty> pProperty = GetElement(strPropertyName);
-    if (pProperty.get())
+    if (pProperty)
     {
         return pProperty->GetString();
     }
@@ -188,7 +176,7 @@ const std::string& NFCPropertyManager::GetPropertyString(const std::string& strP
 const NFGUID& NFCPropertyManager::GetPropertyObject(const std::string& strPropertyName)
 {
     NF_SHARE_PTR<NFIProperty> pProperty = GetElement(strPropertyName);
-    if (pProperty.get())
+    if (pProperty)
     {
         return pProperty->GetObject();
     }
@@ -196,3 +184,24 @@ const NFGUID& NFCPropertyManager::GetPropertyObject(const std::string& strProper
     return NULL_OBJECT;
 }
 
+const NFVector2& NFCPropertyManager::GetPropertyVector2(const std::string& strPropertyName)
+{
+	NF_SHARE_PTR<NFIProperty> pProperty = GetElement(strPropertyName);
+	if (pProperty)
+	{
+		return pProperty->GetVector2();
+	}
+
+	return NULL_VECTOR2;
+}
+
+const NFVector3& NFCPropertyManager::GetPropertyVector3(const std::string& strPropertyName)
+{
+	NF_SHARE_PTR<NFIProperty> pProperty = GetElement(strPropertyName);
+	if (pProperty)
+	{
+		return pProperty->GetVector3();
+	}
+
+	return NULL_VECTOR3;
+}

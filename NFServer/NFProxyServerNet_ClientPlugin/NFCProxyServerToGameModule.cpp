@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//    @FileName      :    NFCProxyServerNet_ClientModule.cpp
+//    @FileName			:    NFCProxyServerNet_ClientModule.cpp
 //    @Author           :    LvSheng.Huang
 //    @Date             :    2013-05-06
 //    @Module           :    NFCProxyServerNet_ClientModule
@@ -8,12 +8,18 @@
 
 #include "NFCProxyServerToGameModule.h"
 #include "NFProxyServerNet_ClientPlugin.h"
-#include "NFComm/NFCore/NFIHeartBeatManager.h"
-#include "NFComm/NFCore/NFCHeartBeatManager.h"
-#include "NFComm/NFPluginModule/NFILogicClassModule.h"
+#include "NFComm/NFPluginModule/NFIClassModule.h"
+#include "NFComm/NFMessageDefine/NFProtocolDefine.hpp"
 
 bool NFCProxyServerToGameModule::Init()
 {
+	m_pNetClientModule = pPluginManager->FindModule<NFINetClientModule>();
+	m_pKernelModule = pPluginManager->FindModule<NFIKernelModule>();
+	m_pProxyServerNet_ServerModule = pPluginManager->FindModule<NFIProxyServerNet_ServerModule>();
+	m_pElementModule = pPluginManager->FindModule<NFIElementModule>();
+	m_pLogModule = pPluginManager->FindModule<NFILogModule>();
+	m_pClassModule = pPluginManager->FindModule<NFIClassModule>();
+
     return true;
 }
 
@@ -26,43 +32,34 @@ bool NFCProxyServerToGameModule::Shut()
 
 bool NFCProxyServerToGameModule::Execute()
 {
-    return NFIClusterClientModule::Execute();
+	return true;
 }
 
 bool NFCProxyServerToGameModule::AfterInit()
 {
-    m_pProxyLogicModule = pPluginManager->FindModule<NFIProxyLogicModule>("NFCProxyLogicModule");
-    m_pKernelModule = pPluginManager->FindModule<NFIKernelModule>("NFCKernelModule");
-    m_pProxyServerNet_ServerModule = pPluginManager->FindModule<NFIProxyServerNet_ServerModule>("NFCProxyServerNet_ServerModule");
-    m_pElementInfoModule = pPluginManager->FindModule<NFIElementInfoModule>("NFCElementInfoModule");
-    m_pLogModule = pPluginManager->FindModule<NFILogModule>("NFCLogModule");
-    m_pLogicClassModule = pPluginManager->FindModule<NFILogicClassModule>("NFCLogicClassModule");
+	m_pNetClientModule->AddReceiveCallBack(NF_SERVER_TYPES::NF_ST_GAME, NFMsg::EGMI_ACK_ENTER_GAME, this, &NFCProxyServerToGameModule::OnAckEnterGame);
+	m_pNetClientModule->AddReceiveCallBack(NF_SERVER_TYPES::NF_ST_GAME, this, &NFCProxyServerToGameModule::Transpond);
 
-    assert(NULL != m_pProxyLogicModule);
-    assert(NULL != m_pKernelModule);
-    assert(NULL != m_pProxyServerNet_ServerModule);
-    assert(NULL != m_pElementInfoModule);
-    assert(NULL != m_pLogModule);
-    assert(NULL != m_pLogicClassModule);
+	m_pNetClientModule->AddEventCallBack(NF_SERVER_TYPES::NF_ST_GAME, this, &NFCProxyServerToGameModule::OnSocketGSEvent);
+	m_pNetClientModule->ExpandBufferSize();
 
-    NFIClusterClientModule::Bind(this, &NFCProxyServerToGameModule::OnReciveGSPack, &NFCProxyServerToGameModule::OnSocketGSEvent);
-
-    NF_SHARE_PTR<NFILogicClass> xLogicClass = m_pLogicClassModule->GetElement("Server");
-    if (xLogicClass.get())
+    NF_SHARE_PTR<NFIClass> xLogicClass = m_pClassModule->GetElement(NFrame::Server::ThisName());
+    if (xLogicClass)
     {
-        NFList<std::string>& xNameList = xLogicClass->GetConfigNameList();
-        std::string strConfigName;
-        for (bool bRet = xNameList.First(strConfigName); bRet; bRet = xNameList.Next(strConfigName))
-        {
-            const int nServerType = m_pElementInfoModule->GetPropertyInt(strConfigName, "Type");
-            const int nServerID = m_pElementInfoModule->GetPropertyInt(strConfigName, "ServerID");
+		const std::vector<std::string>& strIdList = xLogicClass->GetIDList();
+		for (int i = 0; i < strIdList.size(); ++i)
+		{
+			const std::string& strId = strIdList[i];
+
+            const int nServerType = m_pElementModule->GetPropertyInt32(strId, NFrame::Server::Type());
+            const int nServerID = m_pElementModule->GetPropertyInt32(strId, NFrame::Server::ServerID());
             if (nServerType == NF_SERVER_TYPES::NF_ST_GAME)
             {
-                const int nPort = m_pElementInfoModule->GetPropertyInt(strConfigName, "Port");
-                const int nMaxConnect = m_pElementInfoModule->GetPropertyInt(strConfigName, "MaxOnline");
-                const int nCpus = m_pElementInfoModule->GetPropertyInt(strConfigName, "CpuCount");
-                const std::string& strName = m_pElementInfoModule->GetPropertyString(strConfigName, "Name");
-                const std::string& strIP = m_pElementInfoModule->GetPropertyString(strConfigName, "IP");
+                const int nPort = m_pElementModule->GetPropertyInt32(strId, NFrame::Server::Port());
+                const int nMaxConnect = m_pElementModule->GetPropertyInt32(strId, NFrame::Server::MaxOnline());
+                const int nCpus = m_pElementModule->GetPropertyInt32(strId, NFrame::Server::CpuCount());
+                const std::string& strName = m_pElementModule->GetPropertyString(strId, NFrame::Server::Name());
+                const std::string& strIP = m_pElementModule->GetPropertyString(strId, NFrame::Server::IP());
 
                 ConnectData xServerData;
 
@@ -72,7 +69,7 @@ bool NFCProxyServerToGameModule::AfterInit()
                 xServerData.nPort = nPort;
                 xServerData.strName = strName;
 
-                NFIClusterClientModule::AddServer(xServerData);
+				m_pNetClientModule->AddServer(xServerData);
             }
         }
     }
@@ -80,20 +77,7 @@ bool NFCProxyServerToGameModule::AfterInit()
     return true;
 }
 
-void NFCProxyServerToGameModule::OnReciveGSPack(const int nSockIndex, const int nMsgID, const char* msg, const uint32_t nLen)
-{
-    switch (nMsgID)
-    {
-        case NFMsg::EGMI_ACK_ENTER_GAME:
-            OnAckEnterGame(nSockIndex, nMsgID, msg, nLen);
-            break;
-        default:
-            m_pProxyServerNet_ServerModule->Transpond(nSockIndex, nMsgID, msg, nLen);
-            break;
-    }
-}
-
-void NFCProxyServerToGameModule::OnSocketGSEvent(const int nSockIndex, const NF_NET_EVENT eEvent, NFINet* pNet)
+void NFCProxyServerToGameModule::OnSocketGSEvent(const NFSOCK nSockIndex, const NF_NET_EVENT eEvent, NFINet* pNet)
 {
     if (eEvent & NF_NET_EVENT_EOF)
     {
@@ -113,22 +97,23 @@ void NFCProxyServerToGameModule::OnSocketGSEvent(const int nSockIndex, const NF_
 
 void NFCProxyServerToGameModule::Register(NFINet* pNet)
 {
-    NF_SHARE_PTR<NFILogicClass> xLogicClass = m_pLogicClassModule->GetElement("Server");
-    if (xLogicClass.get())
+    NF_SHARE_PTR<NFIClass> xLogicClass = m_pClassModule->GetElement(NFrame::Server::ThisName());
+    if (xLogicClass)
     {
-        NFList<std::string>& xNameList = xLogicClass->GetConfigNameList();
-        std::string strConfigName;
-        for (bool bRet = xNameList.First(strConfigName); bRet; bRet = xNameList.Next(strConfigName))
-        {
-            const int nServerType = m_pElementInfoModule->GetPropertyInt(strConfigName, "Type");
-            const int nServerID = m_pElementInfoModule->GetPropertyInt(strConfigName, "ServerID");
-            if (nServerType == NF_SERVER_TYPES::NF_ST_PROXY && pPluginManager->AppID() == nServerID)
+		const std::vector<std::string>& strIdList = xLogicClass->GetIDList();
+		for (int i = 0; i < strIdList.size(); ++i)
+		{
+			const std::string& strId = strIdList[i];
+
+            const int nServerType = m_pElementModule->GetPropertyInt32(strId, NFrame::Server::Type());
+            const int nServerID = m_pElementModule->GetPropertyInt32(strId, NFrame::Server::ServerID());
+            if (nServerType == NF_SERVER_TYPES::NF_ST_PROXY && pPluginManager->GetAppID() == nServerID)
             {
-                const int nPort = m_pElementInfoModule->GetPropertyInt(strConfigName, "Port");
-                const int nMaxConnect = m_pElementInfoModule->GetPropertyInt(strConfigName, "MaxOnline");
-                const int nCpus = m_pElementInfoModule->GetPropertyInt(strConfigName, "CpuCount");
-                const std::string& strName = m_pElementInfoModule->GetPropertyString(strConfigName, "Name");
-                const std::string& strIP = m_pElementInfoModule->GetPropertyString(strConfigName, "IP");
+                const int nPort = m_pElementModule->GetPropertyInt32(strId, NFrame::Server::Port());
+                const int nMaxConnect = m_pElementModule->GetPropertyInt32(strId, NFrame::Server::MaxOnline());
+                const int nCpus = m_pElementModule->GetPropertyInt32(strId, NFrame::Server::CpuCount());
+                const std::string& strName = m_pElementModule->GetPropertyString(strId, NFrame::Server::Name());
+                const std::string& strIP = m_pElementModule->GetPropertyString(strId, NFrame::Server::IP());
 
                 NFMsg::ServerInfoReportList xMsg;
                 NFMsg::ServerInfoReport* pData = xMsg.add_server_list();
@@ -142,11 +127,11 @@ void NFCProxyServerToGameModule::Register(NFINet* pNet)
                 pData->set_server_state(NFMsg::EST_NARMAL);
                 pData->set_server_type(nServerType);
 
-                NF_SHARE_PTR<ConnectData> pServerData = GetServerNetInfo(pNet);
+                NF_SHARE_PTR<ConnectData> pServerData = m_pNetClientModule->GetServerNetInfo(pNet);
                 if (pServerData)
                 {
                     int nTargetID = pServerData->nGameID;
-                    SendToServerByPB(nTargetID, NFMsg::EGameMsgID::EGMI_PTWG_PROXY_REGISTERED, xMsg);
+                    m_pNetClientModule->SendToServerByPB(nTargetID, NFMsg::EGameMsgID::EGMI_PTWG_PROXY_REGISTERED, xMsg);
 
                     m_pLogModule->LogNormal(NFILogModule::NLL_INFO_NORMAL, NFGUID(0, pData->server_id()), pData->server_name(), "Register");
                 }
@@ -155,25 +140,28 @@ void NFCProxyServerToGameModule::Register(NFINet* pNet)
     }
 }
 
-void NFCProxyServerToGameModule::OnAckEnterGame(const int nSockIndex, const int nMsgID, const char* msg, const uint32_t nLen)
+void NFCProxyServerToGameModule::OnAckEnterGame(const NFSOCK nSockIndex, const int nMsgID, const char* msg, const uint32_t nLen)
 {
     NFGUID nPlayerID;
     NFMsg::AckEventResult xData;
-    if (!NFINetModule::RecivePB(nSockIndex, nMsgID, msg, nLen, xData, nPlayerID))
+    if (!NFINetModule::ReceivePB( nMsgID, msg, nLen, xData, nPlayerID))
     {
         return;
     }
+ 
+	const NFGUID& xClient = NFINetModule::PBToNF(xData.event_client());
+	const NFGUID& xPlayer = NFINetModule::PBToNF(xData.event_object());
 
-    if (xData.event_code() == NFMsg::EGEC_ENTER_GAME_SUCCESS)
-    {
-        const NFGUID& xClient = NFINetModule::PBToNF(xData.event_client());
-        const NFGUID& xPlayer = NFINetModule::PBToNF(xData.event_object());
-
-        m_pProxyServerNet_ServerModule->EnterGameSuccessEvent(xClient, xPlayer);
-    }
+	m_pProxyServerNet_ServerModule->EnterGameSuccessEvent(xClient, xPlayer);
+	m_pProxyServerNet_ServerModule->Transpond(nSockIndex, nMsgID, msg, nLen);
 }
 
 void NFCProxyServerToGameModule::LogServerInfo(const std::string& strServerInfo)
 {
     m_pLogModule->LogNormal(NFILogModule::NLL_INFO_NORMAL, NFGUID(), strServerInfo, "");
+}
+
+void NFCProxyServerToGameModule::Transpond(const NFSOCK nSockIndex, const int nMsgID, const char * msg, const uint32_t nLen)
+{
+	m_pProxyServerNet_ServerModule->Transpond(nSockIndex, nMsgID, msg, nLen);
 }

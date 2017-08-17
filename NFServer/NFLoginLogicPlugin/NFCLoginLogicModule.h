@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//    @FileName      :    NFCLoginLogicModule.h
+//    @FileName			:    NFCLoginLogicModule.h
 //    @Author           :    LvSheng.Huang
 //    @Date             :    2012-12-15
 //    @Module           :    NFCLoginLogicModule
@@ -9,11 +9,14 @@
 #ifndef NFC_LOGINLOGIC_MODULE_H
 #define NFC_LOGINLOGIC_MODULE_H
 
-#include "NFComm/NFCore/NFMap.h"
+#include "NFComm/NFMessageDefine/NFMsgDefine.h"
+#include "NFComm/NFCore/NFMap.hpp"
 #include "NFComm/NFPluginModule/NFIKernelModule.h"
 #include "NFComm/NFPluginModule/NFILoginLogicModule.h"
-#include "NFComm/NFPluginModule/NFIClusterModule.h"
 #include "NFComm/NFPluginModule/NFILoginNet_ServerModule.h"
+#include "NFComm/NFPluginModule/NFILogModule.h"
+#include "NFComm/NFPluginModule/NFINetModule.h"
+#include "NFComm/NFPluginModule/NFIAccountRedisModule.h"
 
 class NFCLoginLogicModule
     : public NFILoginLogicModule
@@ -26,18 +29,17 @@ public:
 
     virtual bool Init();
     virtual bool Shut();
+    virtual bool ReadyExecute();
     virtual bool Execute();
 
     virtual bool AfterInit();
 
-    virtual int OnLoginProcess(const NFGUID& object, const std::string& strAccount, const std::string& strPwd);
+    virtual void OnLoginProcess(const NFSOCK nSockIndex, const int nMsgID, const char* msg, const uint32_t nLen);
 
 protected:
-
-protected:
-
-    NFIClusterModule* m_pClusterSqlModule;
-    NFILoginNet_ServerModule* m_pLoginNet_ServerModule;
+	NFINetModule* m_pNetModule;
+	NFILogModule* m_pLogModule;
+	NFIAccountRedisModule* m_pAccountRedisModule;
 private:
 };
 

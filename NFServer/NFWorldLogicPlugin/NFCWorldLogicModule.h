@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//    @FileName      :    NFCWorldLogicModule.h
+//    @FileName			:    NFCWorldLogicModule.h
 //    @Author           :    LvSheng.Huang
 //    @Date             :    2012-12-15
 //    @Module           :    NFCWorldLogicModule
@@ -9,7 +9,7 @@
 #ifndef NFC_WORLDLOGIC_MODULE_H
 #define NFC_WORLDLOGIC_MODULE_H
 
-#include "NFComm/NFCore/NFMap.h"
+#include "NFComm/NFCore/NFMap.hpp"
 #include "NFComm/NFPluginModule/NFIKernelModule.h"
 #include "NFComm/NFPluginModule/NFIWorldLogicModule.h"
 

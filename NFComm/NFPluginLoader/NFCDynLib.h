@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//    @FileName      :    NFCDynLib.h
+//    @FileName			:    NFCDynLib.h
 //    @Author           :    LvSheng.Huang
 //    @Date             :    2012-12-15
 //    @Module           :    NFCDynLib
@@ -15,7 +15,7 @@
 
 #if NF_PLATFORM == NF_PLATFORM_WIN
 #    define DYNLIB_HANDLE hInstance
-#    define DYNLIB_LOAD( a ) LoadLibraryEx( a, NULL, LOAD_WITH_ALTERED_SEARCH_PATH )
+#    define DYNLIB_LOAD( a ) LoadLibraryExA( a, NULL, LOAD_WITH_ALTERED_SEARCH_PATH )
 #    define DYNLIB_GETSYM( a, b ) GetProcAddress( a, b )
 #    define DYNLIB_UNLOAD( a ) FreeLibrary( a )
 
@@ -30,8 +30,9 @@ typedef struct HINSTANCE__* hInstance;
 #define DYNLIB_UNLOAD( a ) dlclose( a )
 
 #elif NF_PLATFORM == NF_PLATFORM_APPLE || NF_PLATFORM == NF_PLATFORM_APPLE_IOS
+#include <dlfcn.h>
 #define DYNLIB_HANDLE void*
-#define DYNLIB_LOAD( a ) mac_loadDylib( a )
+#define DYNLIB_LOAD( a ) dlopen( a, RTLD_LOCAL|RTLD_LAZY)
 #define DYNLIB_GETSYM( a, b ) dlsym( a, b )
 #define DYNLIB_UNLOAD( a ) dlclose( a )
 

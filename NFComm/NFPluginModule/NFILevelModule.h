@@ -1,24 +1,24 @@
 // -------------------------------------------------------------------------
-//    @FileName         ：    NFIBuffModule.h
-//    @Author           ：    LvSheng.Huang
-//    @Date             ：    2012-12-15
-//    @Module           ：    NFIBuffModule
+
+
+
+
 //
 // -------------------------------------------------------------------------
 
-#ifndef _NFI_LEVEL_MODULE_H
-#define _NFI_LEVEL_MODULE_H
+#ifndef NFI_LEVEL_MODULE_H
+#define NFI_LEVEL_MODULE_H
 
 #include <iostream>
-#include "NFILogicModule.h"
+#include "NFIModule.h"
 
 
 class NFILevelModule
-    : public NFILogicModule
+    : public NFIModule
 {
 public:
-    //nType:增加原因
-    virtual int AddExp(const NFGUID& self, const int nExp) = 0;
+
+    virtual int AddExp(const NFGUID& self, const int64_t nExp) = 0;
 
 };
 

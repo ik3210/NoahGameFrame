@@ -6,29 +6,29 @@
 //
 // -------------------------------------------------------------------------
 
-#ifndef _NFI_SCENEPROCESS_MODULE_H
-#define _NFI_SCENEPROCESS_MODULE_H
+#ifndef NFI_SCENEPROCESS_MODULE_H
+#define NFI_SCENEPROCESS_MODULE_H
 
 #include <iostream>
-#include "NFILogicModule.h"
+#include "NFIModule.h"
 
 enum E_SCENE_TYPE
 {
-    SCENE_TYPE_NORMAL,//城镇
-    SCENE_TYPE_CLONE_SCENE,//副本
-
-    SCENE_TYPE_ERROR,
+	SCENE_TYPE_NORMAL,
+	SCENE_TYPE_SINGLE_CLONE_SCENE,
+	SCENE_TYPE_MULTI_CLONE_SCENE,
+	SCENE_TYPE_GUILD,
+	SCENE_TYPE_ERROR,
 };
 
 class NFISceneProcessModule
-    : public NFILogicModule
+    : public NFIModule
 {
 
 public:
-    virtual bool IsCloneScene(const int nSceneID) = 0;
-    virtual E_SCENE_TYPE GetCloneSceneType(const int nContainerID) = 0;
-    virtual bool ApplyCloneGroup(const int nSceneID, int& nGroupID) = 0;
-    virtual bool ExitCloneGroup(const int nSceneID, const int& nGroupID) = 0;
+	virtual bool RequestEnterScene(const NFGUID & self, const NFGUID& player) = 0;
+	virtual bool RequestEnterScene(const NFGUID & self, const int nSceneID, const int nType, const NFDataList & argList) = 0;
+	virtual bool RequestEnterScene(const NFGUID& self, const int nSceneID, const int nGrupID, const int nType, const NFDataList& argList) = 0;
 };
 
 #endif

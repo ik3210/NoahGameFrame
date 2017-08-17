@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//    @FileName      :    NFGameServerNet_ClientPlugin.h
+//    @FileName			:    NFGameServerNet_ClientPlugin.h
 //    @Author           :    LvSheng.Huang
 //    @Date             :    2012-07-14 08:51
 //    @Module           :    NFGameServerNet_ClientPlugin
@@ -35,16 +35,16 @@ const int NFGameServerNet_ClientPlugin::GetPluginVersion()
 
 const std::string NFGameServerNet_ClientPlugin::GetPluginName()
 {
-    return GET_CLASS_NAME(NFGameServerNet_ClientPlugin)
+	return GET_CLASS_NAME(NFGameServerNet_ClientPlugin);
 }
 
-       void NFGameServerNet_ClientPlugin::Install()
+void NFGameServerNet_ClientPlugin::Install()
 {
-    REGISTER_MODULE(pPluginManager, NFCGameServerToWorldModule)
+    REGISTER_MODULE(pPluginManager, NFIGameServerToWorldModule, NFCGameServerToWorldModule)
 
 }
 
 void NFGameServerNet_ClientPlugin::Uninstall()
 {
-    UNREGISTER_MODULE(pPluginManager,  NFCGameServerToWorldModule)
+    UNREGISTER_MODULE(pPluginManager, NFIGameServerToWorldModule, NFCGameServerToWorldModule)
 }

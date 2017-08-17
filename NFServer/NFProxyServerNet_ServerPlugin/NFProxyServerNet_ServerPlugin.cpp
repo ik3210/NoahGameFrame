@@ -1,5 +1,5 @@
 // -------------------------------------------------------------------------
-//    @FileName      :    NFGameServerNet_ServerPlugin.cpp
+//    @FileName			:    NFGameServerNet_ServerPlugin.cpp
 //    @Author           :    LvSheng.Huang
 //    @Date             :    2012-07-14 08:51
 //    @Module           :    NFGameServerNet_ServerPlugin
@@ -36,16 +36,16 @@ const int NFProxyServerNet_ServerPlugin::GetPluginVersion()
 
 const std::string NFProxyServerNet_ServerPlugin::GetPluginName()
 {
-    return GET_CLASS_NAME(NFProxyServerNet_ServerPlugin)
+	return GET_CLASS_NAME(NFProxyServerNet_ServerPlugin);
 }
 
-       void NFProxyServerNet_ServerPlugin::Install()
+void NFProxyServerNet_ServerPlugin::Install()
 {
-    REGISTER_MODULE(pPluginManager, NFCProxyServerNet_ServerModule)
+    REGISTER_MODULE(pPluginManager, NFIProxyServerNet_ServerModule, NFCProxyServerNet_ServerModule)
 
 }
 
 void NFProxyServerNet_ServerPlugin::Uninstall()
 {
-    UNREGISTER_MODULE(pPluginManager, NFCProxyServerNet_ServerModule)
+    UNREGISTER_MODULE(pPluginManager, NFIProxyServerNet_ServerModule, NFCProxyServerNet_ServerModule)
 }

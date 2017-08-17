@@ -1,89 +1,87 @@
 // -------------------------------------------------------------------------
-//    @FileName      :    NFIPluginManager.h
+//    @FileName			:    NFIPluginManager.h
 //    @Author           :    LvSheng.Huang
 //    @Date             :    2012-12-15
 //    @Module           :    NFIPluginManager
 //
 // -------------------------------------------------------------------------
 
-#ifndef NFI_PLUGIN_MANAGER_H_
-#define NFI_PLUGIN_MANAGER_H_
+#ifndef NFI_PLUGIN_MANAGER_H
+#define NFI_PLUGIN_MANAGER_H
 
-#include "NFIActor.h"
-#include "NFILogicModule.h"
-#include "NFIActorManager.h"
+#include "NFIModule.h"
+#include "NFPlatform.h"
+
+typedef std::function<bool (const std::string &strFileName, std::string &strContent)> GET_FILECONTENT_FUNCTOR;
+
+#define FIND_MODULE(classBaseName, className)  \
+	assert((TIsDerived<classBaseName, NFIModule>::Result));
 
 class NFIPlugin;
 
-class NFIPluginManager : public NFILogicModule
+class NFIPluginManager : public NFIModule
 {
 public:
-    NFIPluginManager(NFIActorManager* pManager)
+    NFIPluginManager()
     {
 
     }
 
-    template <typename T>
-    T* FindModule(const std::string& strModuleName)
-    {
-        NFILogicModule* pLogicModule = FindModule(strModuleName);
-        if (pLogicModule)
-        {
-            if (!TIsDerived<T, NFILogicModule>::Result)
-            {
-                //BaseTypeComponent must inherit from NFIComponent;
-                return NULL;
-            }
+	template <typename T>
+	T* FindModule()
+	{
+		NFIModule* pLogicModule = FindModule(typeid(T).name());
+		if (pLogicModule)
+		{
+			if (!TIsDerived<T, NFIModule>::Result)
+			{
+				return NULL;
+			}
+            //TODO OSX上dynamic_cast返回了NULL
+#if NF_PLATFORM == NF_PLATFORM_APPLE
+            T* pT = (T*)pLogicModule;
+#else
+			T* pT = dynamic_cast<T*>(pLogicModule);
+#endif
+			assert(NULL != pT);
 
-            return dynamic_cast<T*>(pLogicModule);
-        }
+			return pT;
+		}
+		assert(NULL);
+		return NULL;
+	}
 
-        return NULL;
-    }
-
-    template <typename T>
-    T* GetModule(const std::string& strModuleName)
-    {
-        return FindModule<T>(strModuleName);
-    }
-
-    NFILogicModule* GetModule(const std::string& strModuleName)
-    {
-        return FindModule(strModuleName);
-    }
-
-    virtual bool LoadPlugin() = 0;
+	virtual bool ReLoadPlugin(const std::string& strPluginDLLName) = 0;
 
     virtual void Registered(NFIPlugin* plugin) = 0;
 
-    virtual void UnsRegistered(NFIPlugin* plugin) = 0;
+    virtual void UnRegistered(NFIPlugin* plugin) = 0;
 
     virtual NFIPlugin* FindPlugin(const std::string& strPluginName) = 0;
 
-    virtual void AddModule(const std::string& strModuleName, NFILogicModule* pModule) = 0;
+    virtual void AddModule(const std::string& strModuleName, NFIModule* pModule) = 0;
 
     virtual void RemoveModule(const std::string& strModuleName) = 0;
 
-    virtual NFILogicModule* FindModule(const std::string& strModuleName) = 0;
+    virtual NFIModule* FindModule(const std::string& strModuleName) = 0;
 
-    //////////////////////////////////////////////////////////////////////////
+    virtual int GetAppID() const = 0;
+    virtual void SetAppID(const int nAppID) = 0;
 
-    virtual void AddComponent(const std::string& strComponentName, NFIComponent* pComponent) = 0;
-
-    virtual void RemoveComponent(const std::string& strComponentName) = 0;
-
-    virtual NFIComponent* FindComponent(const std::string& strComponentName) = 0;
-
-    //////////////////////////////////////////////////////////////////////////
-    virtual bool ReInitialize() = 0;
-
-    virtual NFIActorManager* GetActorManager() = 0;
-    virtual void HandlerEx(const NFIActorMessage& message, const Theron::Address from) = 0;
-
-    virtual int AppID() = 0;
     virtual NFINT64 GetInitTime() const = 0;
     virtual NFINT64 GetNowTime() const = 0;
-    virtual const std::string& GetConfigPath() const = 0;
+
+	virtual const std::string& GetConfigPath() const = 0;
+	virtual void SetConfigName(const std::string& strFileName) = 0;
+
+	virtual const std::string& GetAppName() const = 0;
+	virtual void SetAppName(const std::string& strAppName) = 0;
+
+	virtual const std::string& GetLogConfigName() const = 0;
+	virtual void SetLogConfigName(const std::string& strName) = 0;
+
+	virtual void SetGetFileContentFunctor(GET_FILECONTENT_FUNCTOR fun) = 0;
+	virtual bool GetFileContent(const std::string &strFileName, std::string &strContent) = 0;
 };
 
 #endif

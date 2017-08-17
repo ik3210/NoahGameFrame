@@ -1,19 +1,19 @@
 // -------------------------------------------------------------------------
 //    @FileName      :    NFITotalLineTimeModule.h
 //    @Author           :    LvSheng.Huang
-//    @Date             £º    2013-12-03
+
 //    @Module           :    NFITotalLineTimeModule
 //
 // -------------------------------------------------------------------------
 
-#ifndef _NFI_TOTALTIME_MODULE_H
-#define _NFI_TOTALTIME_MODULE_H
+#ifndef NFI_TOTALTIME_MODULE_H
+#define NFI_TOTALTIME_MODULE_H
 
 #include <iostream>
-#include "NFILogicModule.h"
+#include "NFIModule.h"
 
 class NFITotalLineTimeModule
-    : public NFILogicModule
+    : public NFIModule
 {
 public:
 

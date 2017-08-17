@@ -1,8 +1,8 @@
 // -------------------------------------------------------------------------
-//    @FileName         £º    NFIWorldNet_ClientModule.h
-//    @Author           £º    LvSheng.Huang
-//    @Date             £º    2012-12-15
-//    @Module           £º    NFIWorldNet_ClientModule
+//    @FileName			:    NFIWorldToMasterModule.h
+//    @Author           :    LvSheng.Huang
+//    @Date             :    2012-12-15
+//    @Module           :    NFIWorldToMasterModule
 //
 // -------------------------------------------------------------------------
 
@@ -10,14 +10,13 @@
 #define NFI_WORLDNET_CLIENTMODULE_H
 
 #include <iostream>
-#include "NFILogicModule.h"
+#include "NFIModule.h"
 #include "NFINetModule.h"
-#include "NFIClusterClientModule.hpp"
+#include "NFINetClientModule.h"
 
 class NFIWorldToMasterModule
-    : public NFIClusterClientModule
+	: public  NFIModule
 {
-
 public:
 };
 
